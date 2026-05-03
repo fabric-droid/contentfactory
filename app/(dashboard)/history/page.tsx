@@ -21,60 +21,54 @@ export default async function HistoryPage() {
   const historyDays = ({ start: 14, business: 90, agency: 999 } as Record<string, number>)[profile?.plan ?? 'start'] ?? 14
 
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
 
-      <div className="px-8 pt-6 pb-0 flex items-start justify-between flex-shrink-0">
+      {/* Topbar */}
+      <div style={{ padding: '24px 32px 0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
-          <h1 className="font-heading text-[20px] font-semibold tracking-tight" style={{ color: '#F8F8FC' }}>История</h1>
-          <p className="text-[12px] mt-1.5" style={{ color: '#8B8CA8' }}>Генерации хранятся {historyDays} дней на вашем тарифе</p>
+          <div className="font-heading" style={{ fontSize: 20, fontWeight: 600, color: '#F8F8FC', letterSpacing: -0.5 }}>История</div>
+          <div style={{ fontSize: 12, color: '#8B8CA8', marginTop: 5 }}>Генерации хранятся {historyDays} дней на вашем тарифе</div>
         </div>
         <input
-          className="px-3 py-2 text-[13px] rounded-[8px] outline-none transition-colors w-[220px] focus:border-[#C8F135]"
-          style={{ background: '#21222C', border: '1px solid #323344', color: '#F8F8FC' }}
+          style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '8px 13px', color: '#F8F8FC', fontSize: 13, outline: 'none', width: 220 }}
           type="search"
-          placeholder="🔍  Поиск..."
+          placeholder="Поиск..."
         />
       </div>
 
-      <div className="px-8 py-5 flex flex-col gap-2.5">
+      <div style={{ padding: '20px 32px 32px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {!generations || generations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-[300px] gap-3">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl" style={{ background: '#21222C', border: '1px solid #323344' }}>📋</div>
-            <div className="text-[14px] font-medium" style={{ color: '#C4C5D8' }}>История пуста</div>
-            <div className="text-[12px]" style={{ color: '#8B8CA8' }}>Создайте первую генерацию в разделе «Генератор»</div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 300, gap: 12 }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#21222C', border: '1px solid #323344', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>📋</div>
+            <div style={{ fontSize: 14, color: '#C4C5D8', fontWeight: 500 }}>История пуста</div>
+            <div style={{ fontSize: 12, color: '#8B8CA8' }}>Создайте первую генерацию в разделе «Генератор»</div>
           </div>
         ) : (
-          generations.map((g, i) => {
+          generations.map(g => {
             const platforms = (g.platforms as string[]) ?? []
-            const date = new Date(g.created_at).toLocaleDateString('ru-RU', {
-              day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
-            })
+            const date = new Date(g.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
             return (
-              <div key={g.id}
-                className="flex items-center gap-4 rounded-[12px] px-5 py-4 cursor-pointer transition-all hover:border-[#42435A] hover:bg-[#21222C]"
-                style={{ background: '#181920', border: '1px solid #323344', animationDelay: `${i * 0.06}s` }}
-              >
-                <div className="w-10 h-10 rounded-[8px] flex items-center justify-center text-xl flex-shrink-0" style={{ background: '#21222C', border: '1px solid #323344' }}>📝</div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-semibold" style={{ color: '#F8F8FC' }}>{g.topic}</div>
-                  <div className="text-[11px] mt-0.5" style={{ color: '#8B8CA8' }}>{date}</div>
-                  <div className="flex flex-wrap gap-1 mt-2">
+              <div key={g.id} className="hist-row" style={{ background: '#181920', border: '1px solid #323344', borderRadius: 2, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', transition: 'all .15s' }}>
+                <div style={{ flexShrink: 0, width: 36, height: 36, background: '#21222C', border: '1px solid #323344', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📝</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>{g.topic}</div>
+                  <div style={{ fontSize: 11, color: '#8B8CA8', marginTop: 2 }}>{date}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 7 }}>
                     {platforms.map(p => {
                       const pl = PLATFORMS[p as PlatformKey]
                       return pl ? (
-                        <span key={p} className="text-[10px] px-2 py-0.5 rounded-full" style={{ color: '#8B8CA8', background: '#21222C', border: '1px solid #323344' }}>
+                        <span key={p} style={{ fontSize: 10, color: '#8B8CA8', background: '#21222C', border: '1px solid #323344', padding: '2px 7px', borderRadius: 20 }}>
                           {pl.icon} {pl.name}
                         </span>
                       ) : null
                     })}
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0 mr-2">
-                  <div className="font-heading text-[20px] font-bold" style={{ color: '#C8F135' }}>{platforms.length}</div>
-                  <div className="text-[10px]" style={{ color: '#8B8CA8' }}>платформ</div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div className="font-heading" style={{ fontSize: 20, fontWeight: 700, color: '#C8F135' }}>{platforms.length}</div>
+                  <div style={{ fontSize: 10, color: '#8B8CA8' }}>платформ</div>
                 </div>
-                <button className="flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-[8px] flex-shrink-0 hover:opacity-80 transition-opacity"
-                  style={{ background: '#21222C', border: '1px solid #323344', color: '#C4C5D8' }}>
+                <button style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: '#21222C', color: '#C4C5D8', border: '1px solid #323344', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0, transition: 'all .15s' }}>
                   Открыть
                 </button>
               </div>
@@ -82,6 +76,10 @@ export default async function HistoryPage() {
           })
         )}
       </div>
+
+      <style>{`
+        .hist-row:hover { border-color: #42435A !important; background: #21222C !important; }
+      `}</style>
     </div>
   )
 }

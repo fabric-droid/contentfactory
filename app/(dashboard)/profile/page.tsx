@@ -24,6 +24,10 @@ const DEFAULT: Profile = {
   audience: '', style: STYLES[0], tg_bot_token: '', tg_channel_id: '', vk_token: '',
 }
 
+const inp: React.CSSProperties = { background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 13px', color: '#F8F8FC', fontFamily: 'inherit', fontSize: 13, outline: 'none', width: '100%', transition: 'border-color .15s' }
+const lbl: React.CSSProperties = { fontSize: 10, fontWeight: 600, color: '#8B8CA8', textTransform: 'uppercase', letterSpacing: '0.8px', display: 'block', marginBottom: 6 }
+const sec: React.CSSProperties = { background: '#181920', border: '1px solid #323344', borderRadius: 2, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }
+
 export default function ProfilePage() {
   const { toast } = useToast()
   const supabase = createClient()
@@ -59,7 +63,7 @@ export default function ProfilePage() {
       const limit = projectLimits[userProfile?.plan ?? 'start'] ?? 1
       const { count } = await supabase.from('projects').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
       if ((count ?? 0) >= limit) {
-        toast(`Лимит проектов для вашего тарифа: ${limit}. Перейдите на тариф выше.`, 'err')
+        toast(`Лимит проектов для вашего тарифа: ${limit}.`, 'err')
         setSaving(false)
         return
       }
@@ -69,72 +73,68 @@ export default function ProfilePage() {
     setSaving(false)
   }
 
-  if (loading) return <div className="flex items-center justify-center flex-1" style={{ color: '#8B8CA8' }}>Загрузка...</div>
-
-  const inp = "w-full px-3 py-2.5 text-[13px] rounded-[8px] outline-none transition-colors focus:border-[#C8F135]"
-  const inpStyle = { background: '#21222C', border: '1px solid #323344', color: '#F8F8FC' }
-  const lbl = "text-[10px] font-semibold uppercase tracking-[0.8px] mb-1.5 block"
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#8B8CA8' }}>Загрузка...</div>
 
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
 
-      <div className="px-8 pt-6 pb-0 flex items-start justify-between flex-shrink-0">
+      {/* Topbar */}
+      <div style={{ padding: '24px 32px 0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
-          <h1 className="font-heading text-[20px] font-semibold tracking-tight" style={{ color: '#F8F8FC' }}>Профиль бизнеса</h1>
-          <p className="text-[12px] mt-1.5" style={{ color: '#8B8CA8' }}>Используется при каждой генерации — чем точнее, тем лучше тексты</p>
+          <div className="font-heading" style={{ fontSize: 20, fontWeight: 600, color: '#F8F8FC', letterSpacing: -0.5 }}>Профиль бизнеса</div>
+          <div style={{ fontSize: 12, color: '#8B8CA8', marginTop: 5 }}>Используется при каждой генерации — чем точнее, тем лучше тексты</div>
         </div>
         <button onClick={save} disabled={saving}
-          className="flex items-center gap-2 text-[13px] font-semibold px-[18px] py-[9px] rounded-[8px] hover:opacity-90 transition-opacity disabled:opacity-50"
-          style={{ background: '#C8F135', color: '#0E0F13' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 8, background: '#C8F135', color: '#0E0F13', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none', opacity: saving ? 0.6 : 1, transition: 'all .18s' }}
         >
           {saving ? 'Сохраняем...' : 'Сохранить'}
         </button>
       </div>
 
-      <div className="px-8 py-5 max-w-[640px] flex flex-col gap-[18px]">
+      <div style={{ padding: '20px 32px 32px', maxWidth: 640, display: 'flex', flexDirection: 'column', gap: 18 }}>
 
-        <div className="rounded-[12px] p-5 flex flex-col gap-4" style={{ background: '#181920', border: '1px solid #323344' }}>
-          <div className="text-[13px] font-semibold" style={{ color: '#F8F8FC' }}>Основное</div>
-          <div className="grid grid-cols-2 gap-3">
+        {/* Основное */}
+        <div style={sec}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>Основное</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label className={lbl} style={{ color: '#8B8CA8' }}>Название бизнеса</label>
-              <input className={inp} style={inpStyle} value={profile.business_name} onChange={e => set('business_name', e.target.value)} placeholder="Кофейня «Аромат»" />
+              <label style={lbl}>Название бизнеса</label>
+              <input style={inp} value={profile.business_name} onChange={e => set('business_name', e.target.value)} placeholder="Кофейня «Аромат»" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
             </div>
             <div>
-              <label className={lbl} style={{ color: '#8B8CA8' }}>Ниша</label>
-              <input className={inp} style={inpStyle} value={profile.niche} onChange={e => set('niche', e.target.value)} placeholder="Кофейня, кафе" />
+              <label style={lbl}>Ниша</label>
+              <input style={inp} value={profile.niche} onChange={e => set('niche', e.target.value)} placeholder="Кофейня, кафе" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
             </div>
           </div>
           <div>
-            <label className={lbl} style={{ color: '#8B8CA8' }}>Описание продукта или услуги</label>
-            <textarea className={inp} style={{ ...inpStyle, resize: 'vertical', lineHeight: '1.6', minHeight: 72 } as React.CSSProperties} rows={3} value={profile.description} onChange={e => set('description', e.target.value)} placeholder="Уютная кофейня в центре города..." />
+            <label style={lbl}>Описание продукта или услуги</label>
+            <textarea style={{ ...inp, resize: 'vertical', minHeight: 72, lineHeight: '1.6' } as React.CSSProperties} rows={3} value={profile.description} onChange={e => set('description', e.target.value)} placeholder="Уютная кофейня в центре города..." onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
           </div>
           <div>
-            <label className={lbl} style={{ color: '#8B8CA8' }}>УТП (уникальное торговое предложение)</label>
-            <input className={inp} style={inpStyle} value={profile.usp} onChange={e => set('usp', e.target.value)} placeholder="Единственная кофейня с собственной обжаркой" />
+            <label style={lbl}>УТП (уникальное торговое предложение)</label>
+            <input style={inp} value={profile.usp} onChange={e => set('usp', e.target.value)} placeholder="Единственная кофейня с собственной обжаркой" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
           </div>
           <div>
-            <label className={lbl} style={{ color: '#8B8CA8' }}>Главные преимущества</label>
-            <textarea className={inp} style={{ ...inpStyle, resize: 'vertical', lineHeight: '1.6', minHeight: 60 } as React.CSSProperties} rows={2} value={profile.advantages} onChange={e => set('advantages', e.target.value)} placeholder="Собственная обжарка, авторские рецепты, wi-fi..." />
+            <label style={lbl}>Главные преимущества</label>
+            <textarea style={{ ...inp, resize: 'vertical', minHeight: 60, lineHeight: '1.6' } as React.CSSProperties} rows={2} value={profile.advantages} onChange={e => set('advantages', e.target.value)} placeholder="Собственная обжарка, авторские рецепты, wi-fi..." onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
           </div>
         </div>
 
-        <div className="rounded-[12px] p-5 flex flex-col gap-4" style={{ background: '#181920', border: '1px solid #323344' }}>
-          <div className="text-[13px] font-semibold" style={{ color: '#F8F8FC' }}>Аудитория и стиль</div>
+        {/* Аудитория и стиль */}
+        <div style={sec}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>Аудитория и стиль</div>
           <div>
-            <label className={lbl} style={{ color: '#8B8CA8' }}>Целевая аудитория</label>
-            <textarea className={inp} style={{ ...inpStyle, resize: 'vertical', lineHeight: '1.6', minHeight: 60 } as React.CSSProperties} rows={2} value={profile.audience} onChange={e => set('audience', e.target.value)} placeholder="Офисные работники 25–45 лет, молодёжь..." />
+            <label style={lbl}>Целевая аудитория</label>
+            <textarea style={{ ...inp, resize: 'vertical', minHeight: 60, lineHeight: '1.6' } as React.CSSProperties} rows={2} value={profile.audience} onChange={e => set('audience', e.target.value)} placeholder="Офисные работники 25–45 лет, молодёжь..." onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
           </div>
           <div>
-            <label className={lbl} style={{ color: '#8B8CA8' }}>Стиль коммуникации</label>
-            <div className="flex flex-wrap gap-2">
+            <label style={lbl}>Стиль коммуникации</label>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               {STYLES.map(s => (
                 <button key={s} onClick={() => set('style', s)}
-                  className="flex items-center gap-2 flex-1 min-w-[130px] px-3 py-2.5 rounded-[8px] text-[12px] font-medium transition-all"
-                  style={{ background: profile.style === s ? 'rgba(200,241,53,.14)' : '#21222C', border: `1px solid ${profile.style === s ? 'rgba(200,241,53,.3)' : '#323344'}`, color: profile.style === s ? '#C8F135' : '#8B8CA8' }}
+                  style={{ flex: 1, minWidth: 120, display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', borderRadius: 8, border: `1px solid ${profile.style === s ? 'rgba(200,241,53,.3)' : '#323344'}`, cursor: 'pointer', fontSize: 12, fontWeight: 500, transition: 'all .12s', background: profile.style === s ? 'rgba(200,241,53,.14)' : '#21222C', color: profile.style === s ? '#C8F135' : '#8B8CA8', userSelect: 'none' }}
                 >
-                  <span className="w-3.5 h-3.5 rounded-full border-[1.5px] flex-shrink-0 transition-all"
-                    style={{ background: profile.style === s ? '#C8F135' : 'transparent', borderColor: profile.style === s ? '#C8F135' : '#42435A' }} />
+                  <span style={{ width: 14, height: 14, borderRadius: '50%', border: `1.5px solid ${profile.style === s ? '#C8F135' : '#42435A'}`, flexShrink: 0, background: profile.style === s ? '#C8F135' : 'transparent', transition: 'all .12s' }} />
                   {s}
                 </button>
               ))}
@@ -142,33 +142,37 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="rounded-[12px] p-5 flex flex-col gap-4" style={{ background: '#181920', border: '1px solid #323344' }}>
-          <div className="text-[13px] font-semibold" style={{ color: '#F8F8FC' }}>Подключённые платформы для автопостинга</div>
-          <div className="flex flex-col gap-3">
-            <div className="p-4 rounded-[8px] flex flex-col gap-3" style={{ background: '#21222C', border: '1px solid #323344' }}>
-              <div className="flex items-center justify-between">
-                <span className="text-[13px]" style={{ color: '#C4C5D8' }}>💬 Telegram</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: profile.tg_bot_token ? 'rgba(200,241,53,.14)' : '#2C2D3A', border: `1px solid ${profile.tg_bot_token ? 'rgba(200,241,53,.2)' : '#323344'}`, color: profile.tg_bot_token ? '#C8F135' : '#8B8CA8' }}>
+        {/* Платформы */}
+        <div style={sec}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>Подключённые платформы для автопостинга</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* Telegram */}
+            <div style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#C4C5D8' }}>💬 Telegram</span>
+                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: profile.tg_bot_token ? 'rgba(200,241,53,.14)' : '#2C2D3A', color: profile.tg_bot_token ? '#C8F135' : '#8B8CA8', border: `1px solid ${profile.tg_bot_token ? 'rgba(200,241,53,.2)' : '#323344'}` }}>
                   {profile.tg_bot_token ? 'подключён' : 'не подключён'}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <input className={inp} style={inpStyle} value={profile.tg_bot_token} onChange={e => set('tg_bot_token', e.target.value)} placeholder="Bot token (BotFather)" />
-                <input className={inp} style={inpStyle} value={profile.tg_channel_id} onChange={e => set('tg_channel_id', e.target.value)} placeholder="@channel или -100..." />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <input style={inp} value={profile.tg_bot_token} onChange={e => set('tg_bot_token', e.target.value)} placeholder="Bot token (BotFather)" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+                <input style={inp} value={profile.tg_channel_id} onChange={e => set('tg_channel_id', e.target.value)} placeholder="@channel или -100..." onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
               </div>
             </div>
-            <div className="p-4 rounded-[8px] flex flex-col gap-3" style={{ background: '#21222C', border: '1px solid #323344' }}>
-              <div className="flex items-center justify-between">
-                <span className="text-[13px]" style={{ color: '#C4C5D8' }}>🔵 ВКонтакте</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: profile.vk_token ? 'rgba(200,241,53,.14)' : '#2C2D3A', border: `1px solid ${profile.vk_token ? 'rgba(200,241,53,.2)' : '#323344'}`, color: profile.vk_token ? '#C8F135' : '#8B8CA8' }}>
+            {/* VK */}
+            <div style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#C4C5D8' }}>🔵 ВКонтакте</span>
+                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: profile.vk_token ? 'rgba(200,241,53,.14)' : '#2C2D3A', color: profile.vk_token ? '#C8F135' : '#8B8CA8', border: `1px solid ${profile.vk_token ? 'rgba(200,241,53,.2)' : '#323344'}` }}>
                   {profile.vk_token ? 'подключён' : 'не подключён'}
                 </span>
               </div>
-              <input className={inp} style={inpStyle} value={profile.vk_token} onChange={e => set('vk_token', e.target.value)} placeholder="Access token VK API" />
+              <input style={inp} value={profile.vk_token} onChange={e => set('vk_token', e.target.value)} placeholder="Access token VK API" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
             </div>
-            <div className="p-4 rounded-[8px] flex items-center justify-between" style={{ background: '#21222C', border: '1px solid #323344', opacity: 0.5 }}>
-              <span className="text-[13px]" style={{ color: '#C4C5D8' }}>📸 Instagram</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: '#2C2D3A', border: '1px solid #323344', color: '#8B8CA8' }}>доступно в v2</span>
+            {/* Instagram */}
+            <div style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', opacity: 0.6 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#C4C5D8' }}>📸 Instagram</span>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: '#2C2D3A', color: '#8B8CA8', border: '1px solid #323344' }}>доступно в v2</span>
             </div>
           </div>
         </div>

@@ -3,8 +3,7 @@ import Link from 'next/link'
 
 const TIERS = [
   {
-    key: 'start', name: 'Старт', emoji: '🌱', price: 690,
-    desc: 'Для старта и тестирования', tokens: 50, projects: 1, popular: false,
+    key: 'start', name: 'Старт', price: 690, desc: 'Для старта и тестирования', tokens: 50, projects: 1, popular: false,
     features: [
       { ok: true,  text: '50 генераций в месяц' },
       { ok: true,  text: '1 проект / профиль бизнеса' },
@@ -17,8 +16,7 @@ const TIERS = [
     ],
   },
   {
-    key: 'business', name: 'Бизнес', emoji: '🚀', price: 1990,
-    desc: 'Полный набор для активного SMM', tokens: 200, projects: 3, popular: true,
+    key: 'business', name: 'Бизнес', price: 1990, desc: 'Полный набор для активного SMM', tokens: 200, projects: 3, popular: true,
     features: [
       { ok: true,  text: '200 генераций в месяц' },
       { ok: true,  text: '3 проекта / профиля бизнеса' },
@@ -31,8 +29,7 @@ const TIERS = [
     ],
   },
   {
-    key: 'agency', name: 'Агентство', emoji: '🏢', price: 4990,
-    desc: 'Для агентств и нескольких клиентов', tokens: 1000, projects: 20, popular: false,
+    key: 'agency', name: 'Агентство', price: 4990, desc: 'Для агентств и нескольких клиентов', tokens: 1000, projects: 20, popular: false,
     features: [
       { ok: true, text: '1 000 генераций в месяц' },
       { ok: true, text: '20 проектов / профилей бизнеса' },
@@ -61,29 +58,28 @@ export default async function TiersPage() {
   const pct = Math.min(100, Math.round((gensUsed / gensLimit) * 100))
 
   return (
-    <div className="flex flex-col flex-1">
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
 
-      <div className="px-8 pt-6 pb-0 flex-shrink-0">
-        <h1 className="font-heading text-[20px] font-semibold tracking-tight" style={{ color: '#F8F8FC' }}>Тарифы</h1>
-        <p className="text-[12px] mt-1.5" style={{ color: '#8B8CA8' }}>Выберите план под ваши задачи</p>
+      {/* Topbar */}
+      <div style={{ padding: '24px 32px 0', flexShrink: 0 }}>
+        <div className="font-heading" style={{ fontSize: 20, fontWeight: 600, color: '#F8F8FC', letterSpacing: -0.5 }}>Тарифы</div>
+        <div style={{ fontSize: 12, color: '#8B8CA8', marginTop: 5 }}>Выберите план под ваши задачи</div>
       </div>
 
-      <div className="px-8 pt-5 pb-0">
-        <div className="flex items-center gap-4 p-4 rounded-[12px]" style={{ background: '#181920', border: '1px solid #323344' }}>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[12px] font-semibold" style={{ color: '#F8F8FC' }}>Использовано генераций</span>
-              <span className="text-[12px] font-semibold" style={{ color: pct >= 90 ? '#FF5252' : '#C8F135' }}>{gensUsed} / {gensLimit}</span>
+      {/* Usage */}
+      <div style={{ padding: '16px 32px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, background: '#181920', border: '1px solid #323344', borderRadius: 2 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#F8F8FC' }}>Использовано генераций</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: pct >= 90 ? '#FF5252' : '#C8F135' }}>{gensUsed} / {gensLimit}</span>
             </div>
-            <div className="h-1.5 rounded-full" style={{ background: '#323344' }}>
-              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: pct >= 90 ? '#FF5252' : '#C8F135' }} />
+            <div style={{ height: 6, background: '#323344', borderRadius: 3 }}>
+              <div style={{ height: '100%', width: `${pct}%`, background: pct >= 90 ? '#FF5252' : '#C8F135', borderRadius: 3, transition: 'width .3s' }} />
             </div>
           </div>
-          <Link href="#buy"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-[8px] text-[12px] font-semibold flex-shrink-0 hover:opacity-90 transition-opacity"
-            style={{ background: 'rgba(200,241,53,.14)', border: '1px solid rgba(200,241,53,.3)', color: '#C8F135' }}
-          >
-            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5">
+          <Link href="#buy" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 8, background: 'rgba(200,241,53,.14)', border: '1px solid rgba(200,241,53,.3)', color: '#C8F135', fontSize: 12, fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
+            <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" style={{ width: 14, height: 14 }}>
               <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
             </svg>
             Купить токены
@@ -91,57 +87,36 @@ export default async function TiersPage() {
         </div>
       </div>
 
-      <div id="buy" className="px-8 py-5 grid grid-cols-3 gap-3">
+      {/* Tiers grid */}
+      <div id="buy" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, padding: '16px 32px 24px' }}>
         {TIERS.map(tier => {
           const isCurrent = tier.key === currentPlan
           return (
-            <div key={tier.key}
-              className="rounded-[12px] p-6 flex flex-col gap-4 relative overflow-hidden"
-              style={{ background: '#181920', border: `1px solid ${tier.popular ? '#C8F135' : '#323344'}` }}
-            >
+            <div key={tier.key} style={{ background: '#181920', border: `1px solid ${tier.popular ? '#C8F135' : '#323344'}`, borderRadius: 2, padding: 24, display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', overflow: 'hidden' }}>
               {tier.popular && (
-                <div className="absolute top-3.5 -right-6 font-heading text-[8px] font-bold tracking-[0.5px]"
-                  style={{ transform: 'rotate(35deg)', padding: '3px 32px', background: '#C8F135', color: '#0E0F13' }}>
+                <div className="font-heading" style={{ position: 'absolute', top: 14, right: -24, background: '#C8F135', color: '#0E0F13', fontSize: 8, fontWeight: 700, letterSpacing: '0.5px', padding: '3px 32px', transform: 'rotate(35deg)' }}>
                   ПОПУЛЯРНЫЙ
                 </div>
               )}
               <div>
-                <div className="font-heading text-[13px] font-semibold" style={{ color: '#F8F8FC' }}>{tier.emoji} {tier.name}</div>
-                <div className="flex items-baseline gap-1.5 mt-2">
-                  <span className="font-heading text-[28px] font-bold" style={{ color: '#F8F8FC' }}>{tier.price.toLocaleString('ru-RU')}</span>
-                  <span className="text-[12px]" style={{ color: '#8B8CA8' }}>руб/мес</span>
+                <div className="font-heading" style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>{tier.name}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}>
+                  <span className="font-heading" style={{ fontSize: 28, fontWeight: 700, color: '#F8F8FC' }}>{tier.price.toLocaleString('ru-RU')}</span>
+                  <span style={{ fontSize: 12, color: '#8B8CA8' }}>руб/мес</span>
                 </div>
-                <div className="text-[12px] leading-relaxed mt-1" style={{ color: '#8B8CA8' }}>{tier.desc}</div>
+                <div style={{ fontSize: 12, color: '#8B8CA8', lineHeight: 1.5, marginTop: 4 }}>{tier.desc}</div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-[8px] p-2.5 text-center" style={{ background: '#21222C', border: '1px solid #323344' }}>
-                  <div className="font-heading text-[16px] font-bold" style={{ color: '#F8F8FC' }}>{tier.tokens.toLocaleString('ru-RU')}</div>
-                  <div className="text-[9px] uppercase tracking-wider mt-0.5" style={{ color: '#8B8CA8' }}>генераций</div>
-                </div>
-                <div className="rounded-[8px] p-2.5 text-center" style={{ background: '#21222C', border: '1px solid #323344' }}>
-                  <div className="font-heading text-[16px] font-bold" style={{ color: '#F8F8FC' }}>{tier.projects}</div>
-                  <div className="text-[9px] uppercase tracking-wider mt-0.5" style={{ color: '#8B8CA8' }}>
-                    проект{tier.projects > 1 ? (tier.projects < 5 ? 'а' : 'ов') : ''}
-                  </div>
-                </div>
-              </div>
-              <div className="h-px" style={{ background: '#323344' }} />
-              <div className="flex flex-col gap-2 flex-1">
+              <div style={{ height: 1, background: '#323344' }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
                 {tier.features.map((f, j) => (
-                  <div key={j} className="flex items-start gap-2 text-[12px] leading-relaxed">
-                    <span className="flex-shrink-0 mt-px" style={{ color: f.ok ? '#C8F135' : '#42435A' }}>{f.ok ? '✓' : '—'}</span>
-                    <span style={{ color: f.ok ? '#C4C5D8' : '#8B8CA8' }}>{f.text}</span>
+                  <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: f.ok ? '#C4C5D8' : '#8B8CA8', lineHeight: 1.4 }}>
+                    <span style={{ color: f.ok ? '#C8F135' : '#42435A', flexShrink: 0 }}>{f.ok ? '✓' : '—'}</span>
+                    {f.text}
                   </div>
                 ))}
               </div>
               <button
-                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-[8px] text-[13px] font-semibold hover:opacity-90 transition-opacity"
-                style={isCurrent
-                  ? { background: '#C8F135', color: '#0E0F13' }
-                  : tier.popular
-                  ? { background: 'rgba(200,241,53,.14)', border: '1px solid rgba(200,241,53,.3)', color: '#C8F135' }
-                  : { background: 'transparent', color: '#8B8CA8', border: '1px solid #323344' }
-                }
+                style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: isCurrent ? 'none' : tier.popular ? '1px solid rgba(200,241,53,.3)' : '1px solid #323344', background: isCurrent ? '#C8F135' : tier.popular ? 'rgba(200,241,53,.14)' : 'transparent', color: isCurrent ? '#0E0F13' : tier.popular ? '#C8F135' : '#8B8CA8', transition: 'all .18s' }}
               >
                 {isCurrent ? '✓ Текущий план' : `Купить ${tier.name}`}
               </button>
@@ -150,12 +125,13 @@ export default async function TiersPage() {
         })}
       </div>
 
-      <div className="px-8 pb-8">
-        <div className="flex gap-3 items-start p-4 rounded-[12px]" style={{ background: '#181920', border: '1px solid #323344' }}>
-          <span className="text-lg flex-shrink-0 mt-0.5">💡</span>
+      {/* Info */}
+      <div style={{ padding: '0 32px 32px' }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '16px 20px', background: '#181920', border: '1px solid #323344', borderRadius: 2 }}>
+          <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>💡</span>
           <div>
-            <div className="text-[13px] font-semibold mb-1" style={{ color: '#F8F8FC' }}>Генерации не сгорают в конце месяца</div>
-            <div className="text-[12px] leading-relaxed" style={{ color: '#8B8CA8' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC', marginBottom: 4 }}>Генерации не сгорают в конце месяца</div>
+            <div style={{ fontSize: 12, color: '#8B8CA8', lineHeight: 1.6 }}>
               Неиспользованные генерации переносятся на следующий месяц. При смене тарифа остаток сохраняется. Иллюстрации через <strong style={{ color: '#C4C5D8' }}>DALL-E 3</strong> и загрузка собственных фото доступны на всех тарифах.
             </div>
           </div>
