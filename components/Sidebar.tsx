@@ -17,6 +17,11 @@ const NAV_ITEMS = [
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
     </svg>
   )},
+  { href: '/scheduler', label: 'Планировщик', badge: 'NEW', icon: (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" style={{ width: 15, height: 15, flexShrink: 0, stroke: 'currentColor' }}>
+      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+  )},
   { href: '/history', label: 'История', icon: (
     <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" style={{ width: 15, height: 15, flexShrink: 0, stroke: 'currentColor' }}>
       <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
@@ -73,7 +78,6 @@ export default function Sidebar({
 
   return (
     <aside style={{ width: 240, flexShrink: 0, background: '#181920', borderRight: '1px solid #323344', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-      {/* Lime glow */}
       <div style={{ content: '', position: 'absolute', top: -80, left: -60, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(200,241,53,.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       {/* Logo */}
@@ -93,6 +97,7 @@ export default function Sidebar({
             <Link
               key={item.href}
               href={item.href}
+              className="sidebar-item"
               style={{
                 display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px',
                 borderRadius: 8, cursor: 'pointer', marginBottom: 1, position: 'relative',
@@ -100,7 +105,6 @@ export default function Sidebar({
                 background: active ? 'rgba(200,241,53,.14)' : 'transparent',
                 color: active ? '#C8F135' : '#8B8CA8',
               }}
-              className={!active ? 'sidebar-item' : ''}
             >
               {active && (
                 <span style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 2, background: '#C8F135', borderRadius: 2 }} />
@@ -123,6 +127,7 @@ export default function Sidebar({
             <Link
               key={item.href}
               href={item.href}
+              className="sidebar-item"
               style={{
                 display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px',
                 borderRadius: 8, cursor: 'pointer', marginBottom: 1, position: 'relative',
@@ -130,7 +135,6 @@ export default function Sidebar({
                 background: active ? 'rgba(200,241,53,.14)' : 'transparent',
                 color: active ? '#C8F135' : '#8B8CA8',
               }}
-              className={!active ? 'sidebar-item' : ''}
             >
               {active && (
                 <span style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 2, background: '#C8F135', borderRadius: 2 }} />
