@@ -31,6 +31,7 @@ export default function GeneratorPage() {
   const [loading, setLoading] = useState(false)
   const [loadStep, setLoadStep] = useState(0)
   const [results, setResults] = useState<ResultCard[]>([])
+  const [exporting, setExporting] = useState(false)
   const topicRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -127,6 +128,64 @@ export default function GeneratorPage() {
 
   function copyText(text: string) { navigator.clipboard.writeText(text); toast('Текст скопирован ✓', 'ok') }
 
+  async function exportZip() {
+    if (results.length === 0) return
+    setExporting(true)
+    try {
+      const JSZip = (await import('jszip')).default
+      const zip = new JSZip()
+      const folder = zip.folder('contentfactory_export')!
+
+      // Добавляем тексты для каждой платформы
+      for (const r of results) {
+        const pl = PLATFORMS[r.platform]
+        const fileName = r.platform.replace(/[^a-z0-9]/gi, '_')
+        let content = `${pl.name}\n${'='.repeat(pl.name.length)}\n\n${r.text}`
+        if (r.hashtags && r.hashtags.length > 0) {
+          content += `\n\n${r.hashtags.join(' ')}`
+        }
+        folder.file(`${fileName}.txt`, content)
+      }
+
+      // Добавляем иллюстрации
+      if (illustrationUrls.length > 0) {
+        const imgFolder = folder.folder('illustrations')!
+        for (let i = 0; i < illustrationUrls.length; i++) {
+          try {
+            const imgUrl = illustrationUrls[i]
+            const response = await fetch(imgUrl)
+            const blob = await response.blob()
+            const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg'
+            const arrayBuffer = await blob.arrayBuffer()
+            imgFolder.file(`illustration_${i + 1}.${ext}`, arrayBuffer)
+          } catch {
+            // пропускаем если не удалось загрузить
+          }
+        }
+      }
+
+      // Добавляем README
+      const platformList = results.map(r => `- ${PLATFORMS[r.platform].name}: ${r.platform}.txt`).join('\n')
+      const readme = `ContentFactory Export\n${'='.repeat(21)}\n\nТема: ${topic}\nДата: ${new Date().toLocaleDateString('ru-RU')}\n\nФайлы:\n${platformList}${illustrationUrls.length > 0 ? '\n- Иллюстрации: папка illustrations/' : ''}\n\nСоздано с помощью ContentFactory — contentfactory-psi.vercel.app`
+      folder.file('README.txt', readme)
+
+      const blob = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `contentfactory_${topic.slice(0, 30).replace(/[^a-zA-Zа-яА-Я0-9]/g, '_')}.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast('Архив скачан ✓', 'ok')
+    } catch (e) {
+      toast('Ошибка экспорта', 'err')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <>
       {/* Loading overlay */}
@@ -148,9 +207,21 @@ export default function GeneratorPage() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
 
         {/* Topbar */}
-        <div style={{ padding: '24px 32px 0', flexShrink: 0 }}>
-          <div className="font-heading" style={{ fontSize: 20, fontWeight: 600, color: '#F8F8FC', letterSpacing: -0.5 }}>Генератор</div>
-          <div style={{ fontSize: 12, color: '#8B8CA8', marginTop: 5 }}>Тексты для всех платформ + иллюстрация на выбор</div>
+        <div style={{ padding: '24px 32px 0', flexShrink: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <div className="font-heading" style={{ fontSize: 20, fontWeight: 600, color: '#F8F8FC', letterSpacing: -0.5 }}>Генератор</div>
+            <div style={{ fontSize: 12, color: '#8B8CA8', marginTop: 5 }}>Тексты для всех платформ + иллюстрация на выбор</div>
+          </div>
+          {results.length > 0 && (
+            <button onClick={exportZip} disabled={exporting} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 8, background: exporting ? '#2C2D3A' : '#21222C', border: '1px solid #42435A', color: exporting ? '#8B8CA8' : '#C4C5D8', fontSize: 13, fontWeight: 600, cursor: exporting ? 'not-allowed' : 'pointer', transition: 'all .18s', flexShrink: 0 }}>
+              <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" style={{ width: 15, height: 15 }}>
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              {exporting ? 'Создаём архив...' : 'Экспортировать проект'}
+            </button>
+          )}
         </div>
 
         {/* Grid */}
@@ -284,57 +355,69 @@ export default function GeneratorPage() {
                 <div style={{ fontSize: 12, color: '#8B8CA8', textAlign: 'center', maxWidth: 280, lineHeight: 1.5 }}>Заполните форму и нажмите «Сгенерировать» — получите тексты для выбранных платформ</div>
               </div>
             ) : (
-              results.map(r => {
-                const pl = PLATFORMS[r.platform]
-                const hasImg = !['reels', 'tiktok'].includes(r.platform) && illustrationUrls.length > 0
-                return (
-                  <div key={r.platform} style={{ background: '#181920', border: '1px solid #323344', borderRadius: 2, overflow: 'hidden' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#21222C', borderBottom: '1px solid #323344' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(200,241,53,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>{pl.icon}</div>
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>{pl.name}</div>
-                          <div style={{ fontSize: 10, color: '#8B8CA8', marginTop: 1 }}>{pl.type}</div>
+              <>
+                {results.map(r => {
+                  const pl = PLATFORMS[r.platform]
+                  const hasImg = !['reels', 'tiktok'].includes(r.platform) && illustrationUrls.length > 0
+                  return (
+                    <div key={r.platform} style={{ background: '#181920', border: '1px solid #323344', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#21222C', borderBottom: '1px solid #323344' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(200,241,53,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>{pl.icon}</div>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>{pl.name}</div>
+                            <div style={{ fontSize: 10, color: '#8B8CA8', marginTop: 1 }}>{pl.type}</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                          <button onClick={() => copyText(r.text)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'transparent', border: '1px solid #323344', color: '#8B8CA8', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}>Копировать</button>
+                          <button onClick={() => regenPlatform(r.platform)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'transparent', border: '1px solid #323344', color: '#8B8CA8', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}>↻ Платформу</button>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-                        <button onClick={() => copyText(r.text)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'transparent', border: '1px solid #323344', color: '#8B8CA8', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}>Копировать</button>
-                        <button onClick={() => regenPlatform(r.platform)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'transparent', border: '1px solid #323344', color: '#8B8CA8', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .15s' }}>↻ Платформу</button>
+                      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <div contentEditable suppressContentEditableWarning style={{ fontSize: 13, lineHeight: 1.75, color: '#C4C5D8', whiteSpace: 'pre-wrap', outline: 'none', minHeight: 60, cursor: 'text', borderRadius: 8, padding: 8, margin: -8, transition: 'background .15s' }}>{r.text}</div>
+                        {r.hashtags && r.hashtags.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                            {r.hashtags.map(tag => (
+                              <span key={tag} style={{ fontSize: 11, color: '#C8F135', background: 'rgba(200,241,53,.08)', padding: '3px 9px', borderRadius: 20, border: '1px solid rgba(200,241,53,.15)' }}>{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                        {hasImg && (
+                          <div style={{ borderTop: '1px solid #323344', paddingTop: 12 }}>
+                            <span style={{ fontSize: 10, color: '#8B8CA8', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 8 }}>🖼 Иллюстрация · {pl.ratio}</span>
+                            {illustrationUrls.length === 1 ? (
+                              <img src={illustrationUrls[0]} alt="Иллюстрация" style={{ maxWidth: 360, width: '100%', height: 'auto', display: 'block', margin: '0 auto', borderRadius: 8, border: '1px solid #323344' }} />
+                            ) : (
+                              <div style={{ display: 'grid', gridTemplateColumns: illustrationUrls.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
+                                {illustrationUrls.map((u, i) => <img key={i} src={u} alt="Иллюстрация" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 8, border: '1px solid #323344' }} />)}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, borderTop: '1px solid #323344', paddingTop: 12 }}>
+                          <span style={{ fontSize: 11, color: '#8B8CA8' }}>Публикация</span>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {r.platform === 'telegram' && <button style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'rgba(0,136,204,.15)', color: '#48B8F0', border: '1px solid rgba(0,136,204,.25)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>💬 Telegram</button>}
+                            {r.platform === 'vk' && <button style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'rgba(76,117,163,.15)', color: '#7BA8D8', border: '1px solid rgba(76,117,163,.25)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>🔵 VK</button>}
+                            {!['telegram', 'vk'].includes(r.platform) && <span style={{ fontSize: 11, color: '#42435A', padding: '6px 0' }}>Автопостинг — в профиле</span>}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      <div contentEditable suppressContentEditableWarning style={{ fontSize: 13, lineHeight: 1.75, color: '#C4C5D8', whiteSpace: 'pre-wrap', outline: 'none', minHeight: 60, cursor: 'text', borderRadius: 8, padding: 8, margin: -8, transition: 'background .15s' }}>{r.text}</div>
-                      {r.hashtags && r.hashtags.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                          {r.hashtags.map(tag => (
-                            <span key={tag} style={{ fontSize: 11, color: '#C8F135', background: 'rgba(200,241,53,.08)', padding: '3px 9px', borderRadius: 20, border: '1px solid rgba(200,241,53,.15)' }}>{tag}</span>
-                          ))}
-                        </div>
-                      )}
-                      {hasImg && (
-                        <div style={{ borderTop: '1px solid #323344', paddingTop: 12 }}>
-                          <span style={{ fontSize: 10, color: '#8B8CA8', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 8 }}>🖼 Иллюстрация · {pl.ratio}</span>
-                          {illustrationUrls.length === 1 ? (
-                            <img src={illustrationUrls[0]} alt="Иллюстрация" style={{ maxWidth: 360, width: '100%', height: 'auto', display: 'block', margin: '0 auto', borderRadius: 8, border: '1px solid #323344' }} />
-                          ) : (
-                            <div style={{ display: 'grid', gridTemplateColumns: illustrationUrls.length === 2 ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
-                              {illustrationUrls.map((u, i) => <img key={i} src={u} alt="Иллюстрация" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 8, border: '1px solid #323344' }} />)}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, borderTop: '1px solid #323344', paddingTop: 12 }}>
-                        <span style={{ fontSize: 11, color: '#8B8CA8' }}>Публикация</span>
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                          {r.platform === 'telegram' && <button style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'rgba(0,136,204,.15)', color: '#48B8F0', border: '1px solid rgba(0,136,204,.25)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>💬 Telegram</button>}
-                          {r.platform === 'vk' && <button style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, background: 'rgba(76,117,163,.15)', color: '#7BA8D8', border: '1px solid rgba(76,117,163,.25)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>🔵 VK</button>}
-                          {!['telegram', 'vk'].includes(r.platform) && <span style={{ fontSize: 11, color: '#42435A', padding: '6px 0' }}>Автопостинг — в профиле</span>}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })
+                  )
+                })}
+
+                {/* Export button at bottom of results */}
+                <button onClick={exportZip} disabled={exporting} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px', borderRadius: 8, background: '#21222C', border: '1px solid #42435A', color: exporting ? '#8B8CA8' : '#C4C5D8', fontSize: 13, fontWeight: 600, cursor: exporting ? 'not-allowed' : 'pointer', transition: 'all .18s', width: '100%', marginTop: 4 }}>
+                  <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" style={{ width: 16, height: 16 }}>
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  {exporting ? 'Создаём архив...' : 'Экспортировать проект (ZIP)'}
+                </button>
+              </>
             )}
           </div>
         </div>
