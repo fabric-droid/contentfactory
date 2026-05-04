@@ -136,7 +136,7 @@ export default function GeneratorPage() {
       const zip = new JSZip()
       const folder = zip.folder('contentfactory_export')!
 
-      // Добавляем тексты для каждой платформы
+      // Тексты для каждой платформы
       for (const r of results) {
         const pl = PLATFORMS[r.platform]
         const fileName = r.platform.replace(/[^a-z0-9]/gi, '_')
@@ -147,13 +147,25 @@ export default function GeneratorPage() {
         folder.file(`${fileName}.txt`, content)
       }
 
-      // Добавляем иллюстрации
+      // Иллюстрации через прокси-сервер (обход CORS)
       if (illustrationUrls.length > 0) {
         const imgFolder = folder.folder('illustrations')!
         for (let i = 0; i < illustrationUrls.length; i++) {
           try {
             const imgUrl = illustrationUrls[i]
-            const response = await fetch(imgUrl)
+            // Если это blob URL (загруженное фото) — читаем напрямую
+            // Если внешний URL (DALL-E) — через прокси
+            let response: Response
+            if (imgUrl.startsWith('blob:')) {
+              response = await fetch(imgUrl)
+            } else {
+              response = await fetch('/api/proxy-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: imgUrl }),
+              })
+            }
+            if (!response.ok) continue
             const blob = await response.blob()
             const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg'
             const arrayBuffer = await blob.arrayBuffer()
@@ -164,22 +176,22 @@ export default function GeneratorPage() {
         }
       }
 
-      // Добавляем README
+      // README
       const platformList = results.map(r => `- ${PLATFORMS[r.platform].name}: ${r.platform}.txt`).join('\n')
       const readme = `ContentFactory Export\n${'='.repeat(21)}\n\nТема: ${topic}\nДата: ${new Date().toLocaleDateString('ru-RU')}\n\nФайлы:\n${platformList}${illustrationUrls.length > 0 ? '\n- Иллюстрации: папка illustrations/' : ''}\n\nСоздано с помощью ContentFactory — contentfactory-psi.vercel.app`
       folder.file('README.txt', readme)
 
       const blob = await zip.generateAsync({ type: 'blob' })
-      const url = URL.createObjectURL(blob)
+      const dlUrl = URL.createObjectURL(blob)
       const a = document.createElement('a')
-      a.href = url
+      a.href = dlUrl
       a.download = `contentfactory_${topic.slice(0, 30).replace(/[^a-zA-Zа-яА-Я0-9]/g, '_')}.zip`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      URL.revokeObjectURL(dlUrl)
       toast('Архив скачан ✓', 'ok')
-    } catch (e) {
+    } catch {
       toast('Ошибка экспорта', 'err')
     } finally {
       setExporting(false)
@@ -188,7 +200,6 @@ export default function GeneratorPage() {
 
   return (
     <>
-      {/* Loading overlay */}
       {loading && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, background: 'rgba(14,15,19,.88)', backdropFilter: 'blur(6px)' }}>
           <div style={{ width: 44, height: 44, borderRadius: '50%', border: '2px solid #323344', borderTopColor: '#C8F135' }} className="animate-spin-lime" />
@@ -206,7 +217,6 @@ export default function GeneratorPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
 
-        {/* Topbar */}
         <div style={{ padding: '24px 32px 0', flexShrink: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <div>
             <div className="font-heading" style={{ fontSize: 20, fontWeight: 600, color: '#F8F8FC', letterSpacing: -0.5 }}>Генератор</div>
@@ -224,33 +234,27 @@ export default function GeneratorPage() {
           )}
         </div>
 
-        {/* Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', flex: 1, padding: '20px 32px 32px', gap: 0 }}>
 
-          {/* Left panel */}
           <div style={{ background: '#181920', border: '1px solid #323344', borderRadius: 2, padding: 20, display: 'flex', flexDirection: 'column', gap: 16, height: 'fit-content', position: 'sticky', top: 0, maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
             <div className="font-heading" style={{ fontSize: 11, fontWeight: 600, color: '#8B8CA8', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Что генерируем</div>
 
-            {/* Topic */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={lbl}>Тема / название товара <span style={{ color: '#FF5252' }}>*</span></label>
               <input ref={topicRef} value={topic} onChange={e => setTopic(e.target.value.slice(0, 120))} type="text" placeholder="Напр.: Кофе латте с карамелью, Акция —20% на обувь" style={inp} onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
               <div style={{ fontSize: 10, color: '#42435A', textAlign: 'right' }}>{topic.length}/120</div>
             </div>
 
-            {/* Details */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={lbl}>Детали <span style={{ color: '#42435A', fontWeight: 400, textTransform: 'none' }}>(цена, условия, особенности)</span></label>
               <textarea value={details} onChange={e => setDetails(e.target.value)} rows={2} placeholder="Необязательно — для более точных текстов..." style={{ ...inp, resize: 'vertical', lineHeight: '1.6', minHeight: 60 } as React.CSSProperties} onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
             </div>
 
-            {/* URL */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={lbl}>Ссылка <span style={{ color: '#42435A', fontWeight: 400, textTransform: 'none' }}>(необязательно)</span></label>
               <input value={url} onChange={e => setUrl(e.target.value)} type="url" placeholder="https://vk.com/yourbusiness" style={inp} onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
             </div>
 
-            {/* Platforms */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <label style={lbl}>Платформы</label>
               <div style={{ display: 'flex', gap: 6 }}>
@@ -272,7 +276,6 @@ export default function GeneratorPage() {
               </div>
             </div>
 
-            {/* Site mode */}
             {hasSite && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <label style={lbl}>Для сайта / Дзен — текст на основе</label>
@@ -287,7 +290,6 @@ export default function GeneratorPage() {
               </div>
             )}
 
-            {/* Illustration */}
             <div style={{ borderTop: '1px solid #323344', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
               <label style={lbl}>Иллюстрация</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
@@ -336,7 +338,6 @@ export default function GeneratorPage() {
               )}
             </div>
 
-            {/* Generate btn */}
             <button onClick={runGenerate} disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#C8F135', color: '#0E0F13', fontSize: 14, fontWeight: 600, borderRadius: 8, padding: '12px 24px', border: 'none', cursor: 'pointer', opacity: loading ? 0.5 : 1, transition: 'all .18s', width: '100%' }}>
               <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" stroke="currentColor" style={{ width: 16, height: 16 }}>
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
@@ -346,7 +347,6 @@ export default function GeneratorPage() {
             <div style={{ fontSize: 11, color: '#8B8CA8', textAlign: 'center', marginTop: -8 }}>1 генерация из лимита</div>
           </div>
 
-          {/* Results */}
           <div style={{ paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
             {results.length === 0 ? (
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, minHeight: 360 }}>
@@ -407,8 +407,6 @@ export default function GeneratorPage() {
                     </div>
                   )
                 })}
-
-                {/* Export button at bottom of results */}
                 <button onClick={exportZip} disabled={exporting} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px', borderRadius: 8, background: '#21222C', border: '1px solid #42435A', color: exporting ? '#8B8CA8' : '#C4C5D8', fontSize: 13, fontWeight: 600, cursor: exporting ? 'not-allowed' : 'pointer', transition: 'all .18s', width: '100%', marginTop: 4 }}>
                   <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" style={{ width: 16, height: 16 }}>
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
