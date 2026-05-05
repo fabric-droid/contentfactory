@@ -11,7 +11,40 @@ const PLATFORM_PROMPTS: Record<PlatformKey, string> = {
   threads:   'Напиши пост для Threads (до 400 символов). Разговорный стиль, личное мнение, без хэштегов.',
   vk:        'Напиши пост для ВКонтакте (250–400 слов). Структурированный, emoji в начале блоков, с призывом к действию.',
   telegram:  'Напиши пост для Telegram-канала (3–5 предложений). Короткий, emoji, без хэштегов, с ссылкой-заглушкой.',
-  tiktok:    'Напиши сценарий TikTok на 15–20 секунд. Структура: ⚡ HOOK (0–2 сек) → ОСНОВА (2–15 сек) с монтажем → CTA + совет по trending audio. Без иллюстрации.',
+  tiktok:    `Создай детальный промт для видеогенератора (Kling, Runway, Sora) на основе темы. Формат:
+
+🎬 ПРОМТ ДЛЯ ВИДЕОГЕНЕРАТОРА:
+[Детальное описание видео на английском языке для лучшего результата: сцены, движение камеры, освещение, стиль, цветовая палитра, атмосфера]
+
+📱 ФОРМАТ: Вертикальное видео 9:16, 15-30 секунд
+
+🎯 СЦЕНЫ:
+Сцена 1 (0-5 сек): [описание]
+Сцена 2 (5-15 сек): [описание]
+Сцена 3 (15-30 сек): [описание]
+
+✍️ ТЕКСТ НА ЭКРАНЕ: [текст для субтитров/оверлея]
+
+🎵 НАСТРОЕНИЕ: [описание музыки/атмосферы]
+
+💡 РЕКОМЕНДУЕМЫЕ СЕРВИСЫ: Kling AI, Runway Gen-3, Sora`,
+
+  ok:        'Напиши пост для Одноклассников (200–350 слов). Тёплый, семейный стиль, простые слова, emoji умеренно. Аудитория 35+. Акцент на пользу, качество и доверие. Завершить призывом написать в комментариях или поставить класс.',
+  facebook:  'Напиши пост для Facebook (150–300 слов). Структура: цепляющий заголовок → история или факт → польза → CTA. Используй emoji умеренно. Добавь вопрос в конце для вовлечения аудитории. 3–5 хэштегов в конце.',
+  pinterest: `Напиши описание для Pinterest пина. Формат:
+
+📌 ЗАГОЛОВОК ПИНА (до 100 символов):
+[Заголовок]
+
+📝 ОПИСАНИЕ (150–300 слов):
+[SEO-оптимизированное описание с ключевыми словами. Расскажи о продукте/идее, пользе, как использовать. Пиши для поиска.]
+
+🏷️ КЛЮЧЕВЫЕ СЛОВА:
+[10–15 ключевых слов через запятую]
+
+🔗 ПРИЗЫВ К ДЕЙСТВИЮ:
+[Короткий CTA]`,
+
   site:      'Напиши SEO-статью (400–600 слов). Структура: H1 с названием товара, H2 «Преимущества», H2 «Для кого подходит», H2 «Как заказать» с CTA.',
   dzen:      'Напиши статью для Яндекс Дзен (400–600 слов). Нарративный стиль, личная история, интригующий заголовок. Используй подзаголовки и списки.',
 }
@@ -48,7 +81,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fetch project profile for context
     const { data: project } = await supabase
       .from('projects')
       .select('*')
@@ -67,17 +99,14 @@ export async function POST(req: NextRequest) {
 - Стиль: ${project.style || 'дружелюбный'}` : ''
 
     const urlContext = url ? await parseUrl(url) : ''
-
     const selectedPlatforms = (platforms as PlatformKey[]) ?? []
 
-    // System prompt
     const systemPrompt = `Ты профессиональный SMM-копирайтер для русскоязычного малого бизнеса.
-Пиши только на русском языке. Тексты должны быть живыми, конкретными и продающими.
+Пиши только на русском языке (кроме промтов для видеогенераторов — они на английском). Тексты должны быть живыми, конкретными и продающими.
 ${businessContext}
 ${urlContext ? `\nДополнительная информация с сайта:\n${urlContext}` : ''}
 ${siteMode === 'brand' ? '\nДля сайта и Дзен — пиши о бизнесе в целом, а не о конкретном товаре.' : '\nДля сайта и Дзен — пиши именно об этом конкретном товаре/услуге.'}`
 
-    // Generate master text first
     const masterMsg = await openai.chat.completions.create({
       model: 'gpt-4o',
       max_tokens: 1024,
@@ -88,13 +117,12 @@ ${siteMode === 'brand' ? '\nДля сайта и Дзен — пиши о биз
     })
     const masterText = masterMsg.choices[0].message.content ?? ''
 
-    // Generate platform texts in parallel
     const platformResults = await Promise.all(
       selectedPlatforms.map(async (platform) => {
         const prompt = PLATFORM_PROMPTS[platform]
         const msg = await openai.chat.completions.create({
           model: 'gpt-4o',
-          max_tokens: 1024,
+          max_tokens: 1500,
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: `Мастер-текст:\n${masterText}\n\n${prompt}\n\nТема: ${topic}${details ? `\nДетали: ${details}` : ''}` },
@@ -102,7 +130,6 @@ ${siteMode === 'brand' ? '\nДля сайта и Дзен — пиши о биз
         })
         const raw = msg.choices[0].message.content ?? ''
 
-        // Extract hashtags for Instagram
         let text = raw
         let hashtags: string[] = []
         if (platform === 'instagram') {
@@ -117,7 +144,6 @@ ${siteMode === 'brand' ? '\nДля сайта и Дзен — пиши о биз
       })
     )
 
-    // Save to history and increment counter
     if (!regenOnly) {
       await supabase.from('generations').insert({
         user_id: user.id,

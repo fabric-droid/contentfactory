@@ -8,7 +8,10 @@ export const PLATFORMS = {
   threads:   { name: 'Threads', icon: '🧵', type: 'Короткий пост', ratio: '1:1' },
   vk:        { name: 'ВКонтакте', icon: '🔵', type: 'Пост + иллюстрация', ratio: '1.91:1' },
   telegram:  { name: 'Telegram', icon: '💬', type: 'Пост в канал', ratio: '1.91:1' },
-  tiktok:    { name: 'TikTok', icon: '🎵', type: 'Сценарий', ratio: '9:16' },
+  tiktok:    { name: 'TikTok', icon: '🎵', type: 'Промт для видеогенерации', ratio: '9:16' },
+  ok:        { name: 'Одноклассники', icon: '🟠', type: 'Пост + иллюстрация', ratio: '1.91:1' },
+  facebook:  { name: 'Facebook', icon: '📘', type: 'Пост + иллюстрация', ratio: '1.91:1' },
+  pinterest: { name: 'Pinterest', icon: '📌', type: 'Пин + описание', ratio: '2:3' },
   site:      { name: 'Сайт (SEO)', icon: '🌐', type: 'SEO-статья', ratio: '16:9' },
   dzen:      { name: 'Яндекс Дзен', icon: '📰', type: 'Статья', ratio: '16:9' },
 } as const
@@ -16,9 +19,9 @@ export const PLATFORMS = {
 export type PlatformKey = keyof typeof PLATFORMS
 
 export const TIERS = {
-  start:   { name: '🌱 Старт',    price: 690,  gens: 20,  projects: 1, history: 14 },
-  business: { name: '🚀 Бизнес', price: 1990, gens: 100, projects: 3, history: 90 },
-  agency:  { name: '🏢 Агентство', price: 4990, gens: 500, projects: 20, history: 0 },
+  start:    { name: '🌱 Старт',     price: 690,  gens: 20,  projects: 1,  history: 14 },
+  business: { name: '🚀 Бизнес',   price: 1990, gens: 100, projects: 3,  history: 90 },
+  agency:   { name: '🏢 Агентство', price: 4990, gens: 500, projects: 20, history: 0  },
 } as const
 
 export type TierKey = keyof typeof TIERS

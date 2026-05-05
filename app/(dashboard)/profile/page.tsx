@@ -17,16 +17,46 @@ interface Profile {
   tg_bot_token: string
   tg_channel_id: string
   vk_token: string
+  ok_token: string
+  ok_app_key: string
+  ok_group_id: string
+  fb_page_token: string
+  fb_page_id: string
+  pinterest_token: string
+  pinterest_board_id: string
 }
 
 const DEFAULT: Profile = {
   business_name: '', niche: '', description: '', usp: '', advantages: '',
-  audience: '', style: STYLES[0], tg_bot_token: '', tg_channel_id: '', vk_token: '',
+  audience: '', style: STYLES[0],
+  tg_bot_token: '', tg_channel_id: '',
+  vk_token: '',
+  ok_token: '', ok_app_key: '', ok_group_id: '',
+  fb_page_token: '', fb_page_id: '',
+  pinterest_token: '', pinterest_board_id: '',
 }
 
 const inp: React.CSSProperties = { background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 13px', color: '#F8F8FC', fontFamily: 'inherit', fontSize: 13, outline: 'none', width: '100%', transition: 'border-color .15s' }
 const lbl: React.CSSProperties = { fontSize: 10, fontWeight: 600, color: '#8B8CA8', textTransform: 'uppercase', letterSpacing: '0.8px', display: 'block', marginBottom: 6 }
 const sec: React.CSSProperties = { background: '#181920', border: '1px solid #323344', borderRadius: 2, padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }
+
+function PlatformRow({
+  icon, name, connected, children, soon
+}: {
+  icon: string, name: string, connected?: boolean, children?: React.ReactNode, soon?: boolean
+}) {
+  return (
+    <div style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10, opacity: soon ? 0.5 : 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 13, color: '#C4C5D8' }}>{icon} {name}</span>
+        <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: soon ? '#2C2D3A' : connected ? 'rgba(200,241,53,.14)' : '#2C2D3A', color: soon ? '#8B8CA8' : connected ? '#C8F135' : '#8B8CA8', border: `1px solid ${soon ? '#323344' : connected ? 'rgba(200,241,53,.2)' : '#323344'}` }}>
+          {soon ? 'доступно в v2' : connected ? 'подключён' : 'не подключён'}
+        </span>
+      </div>
+      {!soon && children}
+    </div>
+  )
+}
 
 export default function ProfilePage() {
   const { toast } = useToast()
@@ -78,15 +108,13 @@ export default function ProfilePage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
 
-      {/* Topbar */}
       <div style={{ padding: '24px 32px 0', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
           <div className="font-heading" style={{ fontSize: 20, fontWeight: 600, color: '#F8F8FC', letterSpacing: -0.5 }}>Профиль бизнеса</div>
           <div style={{ fontSize: 12, color: '#8B8CA8', marginTop: 5 }}>Используется при каждой генерации — чем точнее, тем лучше тексты</div>
         </div>
         <button onClick={save} disabled={saving}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 8, background: '#C8F135', color: '#0E0F13', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none', opacity: saving ? 0.6 : 1, transition: 'all .18s' }}
-        >
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 8, background: '#C8F135', color: '#0E0F13', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none', opacity: saving ? 0.6 : 1, transition: 'all .18s' }}>
           {saving ? 'Сохраняем...' : 'Сохранить'}
         </button>
       </div>
@@ -132,8 +160,7 @@ export default function ProfilePage() {
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               {STYLES.map(s => (
                 <button key={s} onClick={() => set('style', s)}
-                  style={{ flex: 1, minWidth: 120, display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', borderRadius: 8, border: `1px solid ${profile.style === s ? 'rgba(200,241,53,.3)' : '#323344'}`, cursor: 'pointer', fontSize: 12, fontWeight: 500, transition: 'all .12s', background: profile.style === s ? 'rgba(200,241,53,.14)' : '#21222C', color: profile.style === s ? '#C8F135' : '#8B8CA8', userSelect: 'none' }}
-                >
+                  style={{ flex: 1, minWidth: 120, display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', borderRadius: 8, border: `1px solid ${profile.style === s ? 'rgba(200,241,53,.3)' : '#323344'}`, cursor: 'pointer', fontSize: 12, fontWeight: 500, transition: 'all .12s', background: profile.style === s ? 'rgba(200,241,53,.14)' : '#21222C', color: profile.style === s ? '#C8F135' : '#8B8CA8', userSelect: 'none' }}>
                   <span style={{ width: 14, height: 14, borderRadius: '50%', border: `1.5px solid ${profile.style === s ? '#C8F135' : '#42435A'}`, flexShrink: 0, background: profile.style === s ? '#C8F135' : 'transparent', transition: 'all .12s' }} />
                   {s}
                 </button>
@@ -146,34 +173,48 @@ export default function ProfilePage() {
         <div style={sec}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#F8F8FC' }}>Подключённые платформы для автопостинга</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+
             {/* Telegram */}
-            <div style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#C4C5D8' }}>💬 Telegram</span>
-                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: profile.tg_bot_token ? 'rgba(200,241,53,.14)' : '#2C2D3A', color: profile.tg_bot_token ? '#C8F135' : '#8B8CA8', border: `1px solid ${profile.tg_bot_token ? 'rgba(200,241,53,.2)' : '#323344'}` }}>
-                  {profile.tg_bot_token ? 'подключён' : 'не подключён'}
-                </span>
-              </div>
+            <PlatformRow icon="💬" name="Telegram" connected={!!profile.tg_bot_token}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <input style={inp} value={profile.tg_bot_token} onChange={e => set('tg_bot_token', e.target.value)} placeholder="Bot token (BotFather)" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
                 <input style={inp} value={profile.tg_channel_id} onChange={e => set('tg_channel_id', e.target.value)} placeholder="@channel или -100..." onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
               </div>
-            </div>
+            </PlatformRow>
+
             {/* VK */}
-            <div style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#C4C5D8' }}>🔵 ВКонтакте</span>
-                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: profile.vk_token ? 'rgba(200,241,53,.14)' : '#2C2D3A', color: profile.vk_token ? '#C8F135' : '#8B8CA8', border: `1px solid ${profile.vk_token ? 'rgba(200,241,53,.2)' : '#323344'}` }}>
-                  {profile.vk_token ? 'подключён' : 'не подключён'}
-                </span>
-              </div>
+            <PlatformRow icon="🔵" name="ВКонтакте" connected={!!profile.vk_token}>
               <input style={inp} value={profile.vk_token} onChange={e => set('vk_token', e.target.value)} placeholder="Access token VK API" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
-            </div>
+            </PlatformRow>
+
+            {/* Одноклассники */}
+            <PlatformRow icon="🟠" name="Одноклассники" connected={!!profile.ok_token}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <input style={inp} value={profile.ok_token} onChange={e => set('ok_token', e.target.value)} placeholder="Access token OK API" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+                <input style={inp} value={profile.ok_app_key} onChange={e => set('ok_app_key', e.target.value)} placeholder="Application key" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+              </div>
+              <input style={inp} value={profile.ok_group_id} onChange={e => set('ok_group_id', e.target.value)} placeholder="ID группы (необязательно)" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+            </PlatformRow>
+
+            {/* Facebook */}
+            <PlatformRow icon="📘" name="Facebook" connected={!!profile.fb_page_token}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <input style={inp} value={profile.fb_page_token} onChange={e => set('fb_page_token', e.target.value)} placeholder="Page Access Token" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+                <input style={inp} value={profile.fb_page_id} onChange={e => set('fb_page_id', e.target.value)} placeholder="Page ID" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+              </div>
+            </PlatformRow>
+
+            {/* Pinterest */}
+            <PlatformRow icon="📌" name="Pinterest" connected={!!profile.pinterest_token}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <input style={inp} value={profile.pinterest_token} onChange={e => set('pinterest_token', e.target.value)} placeholder="Access token Pinterest" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+                <input style={inp} value={profile.pinterest_board_id} onChange={e => set('pinterest_board_id', e.target.value)} placeholder="Board ID" onFocus={e => (e.target.style.borderColor = '#C8F135')} onBlur={e => (e.target.style.borderColor = '#323344')} />
+              </div>
+            </PlatformRow>
+
             {/* Instagram */}
-            <div style={{ background: '#21222C', border: '1px solid #323344', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', opacity: 0.6 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#C4C5D8' }}>📸 Instagram</span>
-              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 20, background: '#2C2D3A', color: '#8B8CA8', border: '1px solid #323344' }}>доступно в v2</span>
-            </div>
+            <PlatformRow icon="📸" name="Instagram" soon />
+
           </div>
         </div>
 
