@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContentFactory — Контент для соцсетей за 30 секунд</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Geologica:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--ink:#0d0d0f;--ink2:#111114;--ink3:#16161a;--ink4:#1c1c21;--line:#ffffff0f;--line2:#ffffff1a;--smoke:#6b6b7a;--mist:#9898aa;--snow:#f0f0f5;--lime:#c8f135;--r:2px;}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--snow);font-family:'Geologica',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:rgba(13,13,15,.92);backdrop-filter:blur(16px);}
+.nav-logo{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;color:var(--snow);text-decoration:none;}
+.nav-logo span{color:var(--lime);}
+.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links a{color:var(--mist);text-decoration:none;font-size:13px;transition:color .15s;}
+.nav-links a:hover{color:var(--snow);}
+.nav-cta{background:var(--lime);color:#0d0d0f!important;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;padding:9px 20px;border-radius:var(--r);text-decoration:none;transition:opacity .15s;}
+.nav-cta:hover{opacity:.88;}
+
+/* BURGER */
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:none;z-index:210;}
+.burger span{display:block;width:22px;height:2px;background:var(--snow);border-radius:2px;transition:all .3s;}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* MOBILE MENU */
+.mob-menu{display:none;position:fixed;inset:0;top:64px;background:rgba(13,13,15,.98);backdrop-filter:blur(24px);z-index:190;flex-direction:column;align-items:center;justify-content:center;gap:36px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.mob-menu.open{opacity:1;pointer-events:all;}
+.mob-menu a{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:600;color:var(--mist);text-decoration:none;transition:color .15s;}
+.mob-menu a:hover{color:var(--snow);}
+.mob-menu .nav-cta{font-size:14px;padding:14px 36px;}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 48px 80px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-300px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(200,241,53,.06) 0%,transparent 65%);pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(200,241,53,.07);border:1px solid rgba(200,241,53,.18);border-radius:100px;padding:6px 16px;font-size:11px;color:var(--lime);margin-bottom:32px;font-family:'Unbounded',sans-serif;font-weight:600;letter-spacing:.3px;}
+.hero-badge::before{content:'';width:6px;height:6px;background:var(--lime);border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+h1{font-family:'Unbounded',sans-serif;font-size:clamp(30px,5vw,62px);font-weight:900;line-height:1.1;letter-spacing:-1.5px;max-width:820px;margin-bottom:24px;}
+h1 span{color:var(--lime);}
+.hero-sub{font-size:clamp(15px,1.8vw,18px);color:var(--mist);max-width:500px;margin-bottom:44px;line-height:1.75;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:72px;}
+.btn-lime{background:var(--lime);color:#0d0d0f;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;padding:14px 30px;border-radius:var(--r);text-decoration:none;transition:opacity .15s;}
+.btn-lime:hover{opacity:.88;}
+.btn-ghost{background:transparent;color:var(--mist);font-size:13px;padding:14px 30px;border-radius:var(--r);text-decoration:none;border:1px solid var(--line2);transition:all .15s;}
+.btn-ghost:hover{border-color:rgba(255,255,255,.25);color:var(--snow);}
+.hero-stats{display:flex;gap:56px;flex-wrap:wrap;justify-content:center;}
+.stat-n{font-family:'Unbounded',sans-serif;font-size:30px;font-weight:900;color:var(--snow);}
+.stat-n em{color:var(--lime);font-style:normal;}
+.stat-n em.inf{font-size:42px;line-height:1;vertical-align:middle;}
+.stat-l{font-size:12px;color:var(--smoke);margin-top:3px;text-align:center;}
+
+/* ── PAIN ── */
+.pain{padding:80px 48px;max-width:1100px;margin:0 auto;}
+.pain-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:stretch;padding:56px 0;}
+.pain-left h2{font-family:'Unbounded',sans-serif;font-size:clamp(20px,3vw,40px);font-weight:800;line-height:1.15;letter-spacing:-.5px;margin-bottom:20px;}
+.pain-left h2 span{color:var(--lime);}
+.pain-left p{font-size:14px;color:var(--mist);line-height:1.8;margin-bottom:24px;}
+.pain-list{display:flex;flex-direction:column;gap:12px;}
+.pain-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--mist);line-height:1.6;}
+.pain-item svg{flex-shrink:0;margin-top:2px;}
+.pain-right{display:flex;flex-direction:column;}
+.db-wrap{flex:1;}
+.pain-card{padding:14px 0;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);}
+.pain-card:last-child{border-bottom:none;}
+.p-ico{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:6px;}
+.p-ico.r{background:rgba(255,80,80,.08);}
+.p-ico.g{background:rgba(200,241,53,.08);}
+.p-ico.r svg{stroke:#ff5050;}
+.p-ico.g svg{stroke:var(--lime);}
+.p-ico svg{fill:none;stroke-width:1.5;width:16px;height:16px;}
+.pain-card-t{font-size:13px;color:var(--mist);line-height:1.5;}
+.pain-card-t s{color:var(--smoke);text-decoration:line-through;}
+.pain-card-t b{color:var(--lime);font-weight:500;}
+.pain-card-label{font-size:10px;font-family:'Unbounded',sans-serif;font-weight:700;letter-spacing:.5px;margin-bottom:4px;}
+.pain-card-label.bad{color:#ff5050;}
+.pain-card-label.good{color:var(--lime);}
+
+/* ── WOW DEMO SECTION ── */
+.demo-s{padding:0 48px 100px;max-width:1100px;margin:0 auto;}
+.demo-label{font-size:10px;color:var(--smoke);text-transform:uppercase;letter-spacing:.8px;margin-bottom:20px;font-family:'Unbounded',sans-serif;text-align:center;}
+.demo-wrap{background:var(--ink2);border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 60px 120px rgba(0,0,0,.6),0 0 0 1px rgba(200,241,53,.04);position:relative;}
+/* fake browser chrome */
+.demo-chrome{background:var(--ink3);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:8px;}
+.d-dot{width:9px;height:9px;border-radius:50%;}
+.d-dot:nth-child(1){background:#ff5f57;}
+.d-dot:nth-child(2){background:#febc2e;}
+.d-dot:nth-child(3){background:#28c840;}
+.d-url{flex:1;background:var(--ink4);border-radius:3px;padding:5px 12px;font-size:10px;color:var(--smoke);margin:0 12px;max-width:300px;}
+/* layout */
+.demo-body{display:flex;min-height:580px;}
+.demo-sb{width:180px;background:var(--ink3);border-right:1px solid var(--line);padding:16px 0;flex-shrink:0;}
+.d-logo{padding:0 14px 16px;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--snow);border-bottom:1px solid var(--line);margin-bottom:10px;}
+.d-logo span{color:var(--lime);}
+.d-sec{padding:8px 14px 4px;font-size:8px;color:var(--smoke);text-transform:uppercase;letter-spacing:.8px;}
+.d-it{display:flex;align-items:center;gap:7px;padding:7px 14px;font-size:10px;color:var(--mist);cursor:pointer;transition:all .15s;}
+.d-it.on{background:rgba(200,241,53,.07);color:var(--lime);border-left:2px solid var(--lime);}
+.d-it svg{width:11px;height:11px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;}
+.demo-main{flex:1;padding:24px;display:flex;flex-direction:column;gap:20px;overflow:hidden;}
+/* input area */
+.d-input-row{display:flex;gap:10px;align-items:flex-end;}
+.d-input-box{flex:1;background:var(--ink4);border:1px solid var(--line2);border-radius:4px;padding:10px 14px;font-size:12px;color:var(--snow);font-family:'Geologica',sans-serif;min-height:44px;display:flex;align-items:center;position:relative;overflow:hidden;}
+.d-input-box .cursor{display:inline-block;width:2px;height:13px;background:var(--lime);margin-left:2px;animation:blink .9s infinite;vertical-align:middle;}
+.d-plats-row{display:flex;gap:6px;flex-wrap:wrap;}
+.d-plat{background:var(--ink4);border:1px solid var(--line);border-radius:3px;padding:4px 9px;font-size:9px;color:var(--smoke);font-family:'Unbounded',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.d-plat.sel{background:rgba(200,241,53,.1);border-color:rgba(200,241,53,.3);color:var(--lime);}
+.d-gen-btn{background:var(--lime);color:#0d0d0f;font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;padding:10px 18px;border-radius:3px;border:none;cursor:pointer;white-space:nowrap;transition:opacity .15s;display:flex;align-items:center;gap:6px;}
+.d-gen-btn svg{width:11px;height:11px;stroke:#0d0d0f;fill:none;stroke-width:2.5;}
+/* progress bar */
+.d-progress{height:2px;background:var(--line);border-radius:2px;overflow:hidden;opacity:0;transition:opacity .2s;}
+.d-progress-bar{height:100%;background:var(--lime);width:0;border-radius:2px;transition:width .05s linear;}
+/* results grid */
+.d-results{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;opacity:0;transform:translateY(8px);transition:all .4s ease;}
+.d-results.show{opacity:1;transform:translateY(0);}
+.d-card{background:var(--ink4);border:1px solid var(--line);border-radius:4px;padding:12px;position:relative;overflow:hidden;}
+.d-card-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.d-card-plat{font-size:8px;font-family:'Unbounded',sans-serif;font-weight:700;color:var(--smoke);text-transform:uppercase;letter-spacing:.5px;}
+.d-card-ico{width:14px;height:14px;flex-shrink:0;}
+.d-card-ico svg{width:14px;height:14px;stroke:var(--mist);fill:none;stroke-width:1.6;}
+.d-card-text{font-size:10px;color:var(--mist);line-height:1.65;min-height:60px;}
+.d-card-text .line{display:block;height:8px;border-radius:3px;background:var(--line2);margin-bottom:5px;}
+.d-card-text .line.short{width:70%;}
+.d-card-text .line.med{width:90%;}
+.d-card-shine{position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(200,241,53,.04) 50%,transparent 70%);transform:translateX(-100%);animation:shine 2s ease forwards;}
+@keyframes shine{to{transform:translateX(100%);}}
+.d-card-copy{position:absolute;top:8px;right:8px;background:var(--ink3);border:1px solid var(--line);border-radius:3px;padding:3px 7px;font-size:8px;color:var(--smoke);font-family:'Unbounded',sans-serif;font-weight:600;cursor:pointer;opacity:0;transition:opacity .15s;}
+.d-card:hover .d-card-copy{opacity:1;}
+/* image preview card */
+.d-img-card{background:var(--ink4);border:1px solid var(--line);border-radius:4px;padding:12px;grid-column:span 1;}
+.d-img-preview{width:100%;aspect-ratio:1;border-radius:3px;background:linear-gradient(135deg,#1a1a20,#222228);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.d-img-preview svg{width:24px;height:24px;stroke:var(--smoke);fill:none;stroke-width:1.2;opacity:.5;}
+.d-img-glow{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(200,241,53,.12) 0%,transparent 60%);opacity:0;transition:opacity .4s;}
+.d-img-glow.on{opacity:1;}
+.d-img-formats{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
+.d-fmt{background:var(--ink3);border:1px solid var(--line);border-radius:2px;padding:2px 6px;font-size:8px;color:var(--smoke);font-family:'Unbounded',sans-serif;}
+.d-fmt.ready{border-color:rgba(200,241,53,.2);color:var(--lime);}
+/* timing label */
+.d-time{font-size:9px;font-family:'Unbounded',sans-serif;color:var(--smoke);text-align:right;margin-top:4px;opacity:0;transition:opacity .3s;}
+.d-time.show{opacity:1;}
+.d-time em{color:var(--lime);font-style:normal;}
+/* token counter */
+.d-status-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line);margin-top:auto;}
+.d-tokens{font-size:9px;color:var(--smoke);font-family:'Unbounded',sans-serif;}
+.d-tokens em{color:var(--lime);font-style:normal;}
+
+/* SECTIONS */
+.section{padding:100px 48px;}
+.sc{text-align:center;max-width:1100px;margin:0 auto;}
+.tag{display:inline-block;background:rgba(200,241,53,.07);border:1px solid rgba(200,241,53,.18);border-radius:100px;padding:5px 16px;font-size:10px;color:var(--lime);font-family:'Unbounded',sans-serif;font-weight:600;letter-spacing:.4px;margin-bottom:20px;}
+h2{font-family:'Unbounded',sans-serif;font-size:clamp(22px,3.5vw,42px);font-weight:800;line-height:1.15;letter-spacing:-.5px;margin-bottom:16px;}
+h2 span{color:var(--lime);}
+.ssub{font-size:16px;color:var(--mist);max-width:500px;margin:0 auto 56px;line-height:1.7;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;}
+.step{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);padding:32px;position:relative;overflow:hidden;text-align:left;}
+.step::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--lime),transparent);}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.step-ico{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-ico svg{width:20px;height:20px;stroke:var(--lime);fill:none;stroke-width:1.5;}
+.step-t{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--snow);}
+.step-d{font-size:13px;color:var(--smoke);line-height:1.75;}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1100px;margin:0 auto;text-align:left;}
+.feat{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);padding:28px;}
+.feat-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.feat-ico{width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.feat-ico svg{width:20px;height:20px;stroke:var(--lime);fill:none;stroke-width:1.4;}
+.feat-t{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--snow);}
+.feat-d{font-size:13px;color:var(--smoke);line-height:1.7;}
+.plats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:800px;margin:0 auto;}
+.plat{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);padding:11px 18px;font-size:13px;color:var(--mist);display:flex;align-items:center;gap:8px;transition:border-color .15s;}
+.plat svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0;}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1000px;margin:0 auto;}
+.pc{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);padding:32px;position:relative;}
+.pc.pop{border-color:rgba(200,241,53,.28);}
+.pc.pc-selected{border-color:rgba(200,241,53,.5);box-shadow:0 0 0 1px rgba(200,241,53,.15);}
+.pop-b{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--lime);color:#0d0d0f;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;padding:4px 14px;border-radius:100px;white-space:nowrap;}
+.pname{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--smoke);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.pnum{font-family:'Unbounded',sans-serif;font-size:42px;font-weight:900;color:var(--snow);line-height:1;}
+.pnum sup{font-size:18px;vertical-align:top;margin-top:8px;display:inline-block;}
+.pper{font-size:12px;color:var(--smoke);margin:6px 0 24px;}
+.pdiv{height:1px;background:var(--line);margin-bottom:20px;}
+.pfs{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.pf{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--mist);}
+.pfy{color:var(--lime);flex-shrink:0;}
+.pfn{color:var(--smoke);flex-shrink:0;}
+.pf.off{color:var(--smoke);}
+.pbtn{display:block;text-align:center;padding:12px;border-radius:var(--r);font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;text-decoration:none;transition:opacity .15s;}
+.pbtn.lime{background:var(--lime);color:#0d0d0f;}
+.pbtn.lime:hover{opacity:.88;}
+.pbtn.ghost{background:transparent;color:var(--mist);border:1px solid var(--line2);}
+.pbtn.ghost:hover{border-color:rgba(255,255,255,.3);color:var(--snow);}
+.cta-s{padding:100px 48px;text-align:center;position:relative;overflow:hidden;}
+.cta-s::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(200,241,53,.05) 0%,transparent 70%);pointer-events:none;}
+.cta-s h2{max-width:600px;margin:0 auto 16px;}
+.cta-s p{color:var(--mist);margin-bottom:36px;font-size:16px;}
+footer{border-top:1px solid var(--line);padding:40px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.fl{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--snow);}
+.fl span{color:var(--lime);}
+.flinks{display:flex;gap:24px;}
+.flinks a{font-size:13px;color:var(--smoke);text-decoration:none;transition:color .15s;}
+.flinks a:hover{color:var(--mist);}
+.fcopy{font-size:12px;color:var(--smoke);}
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);max-width:1100px;margin:0 auto;}
+.fu{opacity:0;transform:translateY(20px);transition:opacity .55s ease,transform .55s ease;}
+.fu.vis{opacity:1;transform:translateY(0);}
+
+/* ── DEMO CTA HINT ── */
+.d-cta-hint{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(200,241,53,.06);border:1px solid rgba(200,241,53,.15);border-radius:4px;opacity:0;transform:translateY(6px);transition:all .4s ease;pointer-events:none;}
+.d-cta-hint.show{opacity:1;transform:translateY(0);pointer-events:all;}
+.d-cta-hint span{font-size:11px;color:var(--mist);}
+.d-cta-arrow{font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;color:var(--lime);}
+.d-gen-btn.cta-mode{background:var(--lime);animation:pulse-lime 1.5s infinite;}
+@keyframes pulse-lime{0%,100%{box-shadow:0 0 0 0 rgba(200,241,53,.4);}50%{box-shadow:0 0 0 8px rgba(200,241,53,0);}}
+.d-plat.auto-sel{transition:all .3s ease;}
+
+.db-wrap{background:var(--ink2);border:1px solid var(--line);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;}
+.db-wrap::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(200,241,53,.06) 0%,transparent 65%);pointer-events:none;}
+.db-header{display:flex;align-items:center;justify-content:space-between;}
+.db-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--snow);}
+.db-badge{font-size:10px;color:var(--lime);font-family:'Unbounded',sans-serif;font-weight:600;letter-spacing:.3px;animation:blink 2s infinite;}
+.db-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.db-kpi{background:var(--ink3);border:1px solid var(--line);border-radius:4px;padding:12px 10px;}
+.db-kpi-val{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;color:var(--snow);line-height:1;margin-bottom:3px;}
+.db-kpi-lbl{font-size:9px;color:var(--smoke);margin-bottom:6px;}
+.db-kpi-delta{font-size:9px;font-family:'Unbounded',sans-serif;font-weight:700;color:#ff5050;}
+.db-kpi-delta-good{color:var(--lime)!important;}
+.db-chart-lbl{font-size:9px;color:var(--smoke);text-transform:uppercase;letter-spacing:.6px;font-family:'Unbounded',sans-serif;}
+.db-chart{position:relative;height:90px;}
+.db-chart-grid{position:absolute;inset:0 0 18px 0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;}
+.db-chart-grid span{display:block;border-top:1px solid var(--line);width:100%;}
+.db-bars{position:absolute;bottom:18px;left:0;right:0;top:0;display:flex;align-items:flex-end;gap:5px;padding:0 2px;}
+.db-bar{flex:1;border-radius:2px 2px 0 0;background:var(--line2);transition:height .8s cubic-bezier(.4,0,.2,1);height:0;}
+.db-bar.active{background:linear-gradient(to top,var(--lime),rgba(200,241,53,.4));}
+.db-chart-months{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:0 2px;}
+.db-chart-months span{font-size:8px;color:var(--smoke);font-family:'Unbounded',sans-serif;}
+.db-plat-row{display:flex;flex-direction:column;gap:8px;}
+.db-plat-item{display:flex;align-items:center;gap:8px;}
+.db-plat-name{font-size:10px;color:var(--smoke);width:58px;flex-shrink:0;}
+.db-plat-bar-wrap{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden;}
+.db-plat-bar{height:100%;background:var(--lime);border-radius:2px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+.db-plat-num{font-size:10px;color:var(--lime);font-family:'Unbounded',sans-serif;font-weight:700;width:32px;text-align:right;flex-shrink:0;}
+
+@media(max-width:900px){
+  nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .burger{display:flex;}
+  .mob-menu{display:flex;}
+  .hero,.pain,.demo-s,.section,.cta-s{padding-left:20px;padding-right:20px;}
+  .pain-inner{grid-template-columns:1fr;}
+  .steps,.feats,.pgrid{grid-template-columns:1fr;}
+  .demo-sb{display:none;}
+  .d-results{grid-template-columns:1fr 1fr;}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start;}
+}
+@media(max-width:560px){
+  .d-results{grid-template-columns:1fr;}
+  .hero-stats{gap:28px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="/" class="nav-logo">Content<span>Factory</span></a>
+  <div class="nav-links">
+    <a href="#pain">О сервисе</a>
+    <a href="#how">Как работает</a>
+    <a href="#features">Возможности</a>
+    <a href="#pricing">Тарифы</a>
+    <a href="/register" class="nav-cta">Попробовать бесплатно</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Меню">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <a href="#pain" onclick="closeMob()">О сервисе</a>
+  <a href="#how" onclick="closeMob()">Как работает</a>
+  <a href="#features" onclick="closeMob()">Возможности</a>
+  <a href="#pricing" onclick="closeMob()">Тарифы</a>
+  <a href="/register" class="nav-cta" onclick="closeMob()">Попробовать бесплатно</a>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge">✦ Для бизнеса, SMM-специалистов и агентств</div>
+  <h1>Тексты и иллюстрации<br>для соцсетей — <span>за 30 секунд</span></h1>
+  <p class="hero-sub">Введите тему — ContentFactory адаптирует пост под 8 платформ, напишет сценарий для Reels и сгенерирует иллюстрацию. Без копирайтера и дизайнера.</p>
+  <div class="hero-btns">
+    <a href="/register" class="btn-lime">Начать бесплатно — 30 токенов</a>
+    <a href="#pain" class="btn-ghost">Узнать больше</a>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-n"><em>30</em> сек</div><div class="stat-l">на одну генерацию</div></div>
+    <div><div class="stat-n"><em>8</em> платформ</div><div class="stat-l">в одном запуске</div></div>
+    <div><div class="stat-n"><em>100 500+</em> идей</div><div class="stat-l">никогда не закончатся</div></div>
+  </div>
+</section>
+
+<!-- ── PAIN ── -->
+<div class="pain fu" id="pain">
+  <div class="pain-inner">
+    <div class="pain-left">
+      <h2>Хватит тратить часы<br>на <span>одну публикацию</span></h2>
+      <p>Владелец бизнеса, SMM-специалист или агентство — все тратят слишком много времени на написание постов, подбор хэштегов и создание визуала. ContentFactory заменяет весь этот процесс одним нажатием кнопки.</p>
+      <div class="pain-list">
+        <div class="pain-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>Малый бизнес — публикуй самостоятельно, без найма SMM</div>
+        <div class="pain-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>SMM-специалист — ведёт 5 проектов вместо двух, без переработок</div>
+        <div class="pain-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>Агентство — масштабируется без роста штата копирайтеров</div>
+      </div>
+    </div>
+    <div class="pain-right">
+      <!-- MINI DASHBOARD -->
+      <div class="db-wrap">
+        <div class="db-header">
+          <div class="db-title">Аналитика проекта</div>
+          <div class="db-badge">● Live</div>
+        </div>
+        <div class="db-kpis">
+          <div class="db-kpi">
+            <div class="db-kpi-val" id="kpiPosts">5<span style="font-size:13px">×</span></div>
+            <div class="db-kpi-lbl">больше постов</div>
+            <div class="db-kpi-delta">↑ без роста команды</div>
+          </div>
+          <div class="db-kpi">
+            <div class="db-kpi-val" id="kpiReach">30<span style="font-size:11px">мин</span></div>
+            <div class="db-kpi-lbl">вместо 2–4 часов</div>
+            <div class="db-kpi-delta">⚡ на один пост</div>
+          </div>
+          <div class="db-kpi">
+            <div class="db-kpi-val" id="kpiTime">70<span style="font-size:13px">%</span></div>
+            <div class="db-kpi-lbl">меньше рутины</div>
+            <div class="db-kpi-delta db-kpi-delta-good">↓ тексты и адаптации</div>
+          </div>
+        </div>
+        <div class="db-chart-lbl">Публикации по неделям</div>
+        <div class="db-chart">
+          <div class="db-chart-grid"><span></span><span></span><span></span><span></span></div>
+          <div class="db-bars" id="dbBars"></div>
+          <div class="db-chart-months"><span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span><span>Май</span><span>Июн</span><span>Июл</span></div>
+        </div>
+        <div class="db-plat-row">
+          <div class="db-plat-item">
+            <div class="db-plat-name">Instagram</div>
+            <div class="db-plat-bar-wrap"><div class="db-plat-bar" data-w="88"></div></div>
+            <div class="db-plat-num">88%</div>
+          </div>
+          <div class="db-plat-item">
+            <div class="db-plat-name">Telegram</div>
+            <div class="db-plat-bar-wrap"><div class="db-plat-bar" data-w="74"></div></div>
+            <div class="db-plat-num">74%</div>
+          </div>
+          <div class="db-plat-item">
+            <div class="db-plat-name">VK</div>
+            <div class="db-plat-bar-wrap"><div class="db-plat-bar" data-w="61"></div></div>
+            <div class="db-plat-num">61%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── WOW DEMO ── -->
+<div class="demo-s fu" id="demo">
+  <div class="demo-label">↓ &nbsp;Живая демонстрация — нажмите «Сгенерировать»</div>
+  <div class="demo-wrap">
+    <!-- chrome -->
+    <div class="demo-chrome">
+      <div class="d-dot"></div><div class="d-dot"></div><div class="d-dot"></div>
+      <div class="d-url">app.contentfactory.ru/generate</div>
+    </div>
+    <!-- body -->
+    <div class="demo-body">
+      <!-- sidebar -->
+      <div class="demo-sb">
+        <div class="d-logo">Content<span>Factory</span></div>
+        <div class="d-sec">Проект</div>
+        <div class="d-it on">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Генерация
+        </div>
+        <div class="d-it">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Иллюстрации
+        </div>
+        <div class="d-it">
+          <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Автопостинг
+        </div>
+        <div class="d-sec">История</div>
+        <div class="d-it">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Все генерации
+        </div>
+        <div class="d-it">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Профиль бизнеса
+        </div>
+      </div>
+      <!-- main -->
+      <div class="demo-main">
+        <!-- input -->
+        <div>
+          <div style="font-size:10px;color:var(--smoke);font-family:'Unbounded',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Тема публикации</div>
+          <div class="d-input-row">
+            <div class="d-input-box" id="demoInput">
+              <span id="demoText"></span><span class="cursor"></span>
+            </div>
+            <button class="d-gen-btn" id="genBtn" onclick="handleGenBtn()">
+              <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Сгенерировать
+            </button>
+          </div>
+        </div>
+        <!-- platforms -->
+        <div>
+          <div style="font-size:10px;color:var(--smoke);font-family:'Unbounded',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Платформы</div>
+          <div class="d-plats-row">
+            <div class="d-plat sel" onclick="togglePlat(this)">Instagram</div>
+            <div class="d-plat sel" onclick="togglePlat(this)">Telegram</div>
+            <div class="d-plat sel" onclick="togglePlat(this)">ВКонтакте</div>
+            <div class="d-plat" onclick="togglePlat(this)">TikTok</div>
+            <div class="d-plat" onclick="togglePlat(this)">Threads</div>
+            <div class="d-plat" onclick="togglePlat(this)">SEO</div>
+          </div>
+        </div>
+        <!-- progress -->
+        <div class="d-progress" id="dProgress">
+          <div class="d-progress-bar" id="dProgressBar"></div>
+        </div>
+        <!-- results -->
+        <div class="d-results" id="dResults">
+          <!-- filled by JS -->
+        </div>
+        <!-- status bar -->
+        <div class="d-status-bar">
+          <div class="d-tokens">Токенов использовано: <em id="tokenCount">0</em> / 100</div>
+          <div class="d-time" id="dTime">Сгенерировано за <em>0.0с</em></div>
+        </div>
+        <!-- CTA after demo -->
+        <div class="d-cta-hint" id="dCtaHint">
+          <span>Хотите сгенерировать под свою тему?</span>
+          <span class="d-cta-arrow">↑ нажмите «Сгенерировать»</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- ── HOW ── -->
+<section class="section" id="how">
+  <div class="sc">
+    <h2>Три шага до <span>готового контента</span></h2>
+    <p class="ssub">Никаких сложных настроек — просто введите тему.</p>
+    <div class="steps">
+      <div class="step fu">
+        <div class="step-head"><div class="step-ico"><svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><div class="step-t">Настройте проект</div></div>
+        <div class="step-d">Заполните профиль бизнеса — название, аудитория, стиль, УТП. Один раз — используется в каждой генерации.</div>
+      </div>
+      <div class="step fu" style="transition-delay:.1s">
+        <div class="step-head"><div class="step-ico"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="step-t">Введите тему</div></div>
+        <div class="step-d">Напишите название товара или акции, выберите платформы. Можно добавить ссылку — ИИ сам разберётся.</div>
+      </div>
+      <div class="step fu" style="transition-delay:.2s">
+        <div class="step-head"><div class="step-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="step-t">Получите контент</div></div>
+        <div class="step-d">Тексты для каждой платформы + иллюстрация с автоадаптацией под все форматы за 30 секунд.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<section class="section" id="features">
+  <div class="sc">
+    <h2>Всё для <span>контент-маркетинга</span></h2>
+    <p class="ssub">От текста до публикации — в одном сервисе.</p>
+    <div class="feats">
+      <div class="feat fu"><div class="feat-head"><div class="feat-ico"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="feat-t">GPT-4o генерация</div></div><div class="feat-d">Тексты под каждую платформу — Instagram, VK, Telegram, TikTok, SEO и Дзен.</div></div>
+      <div class="feat fu" style="transition-delay:.07s"><div class="feat-head"><div class="feat-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="feat-t">Умный ресайз</div></div><div class="feat-d">Одна иллюстрация — автоматически адаптируется под 1:1, 9:16, 16:9 и другие форматы.</div></div>
+      <div class="feat fu" style="transition-delay:.14s"><div class="feat-head"><div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg></div><div class="feat-t">Автопостинг</div></div><div class="feat-d">Публикуйте в Telegram и VK в один клик прямо из интерфейса.</div></div>
+      <div class="feat fu" style="transition-delay:.21s"><div class="feat-head"><div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="feat-t">Reels и TikTok</div></div><div class="feat-d">Готовые сценарии для вертикального видео с хуком и призывом к действию.</div></div>
+      <div class="feat fu" style="transition-delay:.28s"><div class="feat-head"><div class="feat-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20"/></svg></div><div class="feat-t">SEO-тексты</div></div><div class="feat-d">Оптимизированные описания товаров и статьи для Яндекс Дзена.</div></div>
+      <div class="feat fu" style="transition-delay:.35s"><div class="feat-head"><div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="feat-t">Профиль бизнеса</div></div><div class="feat-d">Настройте стиль и аудиторию один раз — ИИ учитывает это в каждом тексте.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- КОНТЕНТ-ПЛАН НА НЕДЕЛЮ -->
+<section class="section">
+  <div class="sc">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1100px;margin:0 auto;text-align:left;">
+
+      <!-- LEFT: TEXT -->
+      <div>
+        <div class="tag" style="margin-bottom:20px;">Отложенный постинг</div>
+        <h2 style="margin-bottom:16px;">Нажми кнопку —<br>получи контент <span>на неделю</span></h2>
+        <p style="font-size:15px;color:var(--mist);line-height:1.8;margin-bottom:28px;">Не нужно каждый день придумывать о чём писать. ContentFactory генерирует 7 тем, ты корректируешь если нужно — и получаешь готовый контент на всю неделю за один сеанс.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.5" width="18" height="18" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style="font-size:14px;color:var(--mist);">ИИ сам придумывает темы на основе профиля вашего бизнеса</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.5" width="18" height="18" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style="font-size:14px;color:var(--mist);">Каждую тему можно изменить или перегенерировать</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.5" width="18" height="18" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style="font-size:14px;color:var(--mist);">7 постов планируются автоматически через отложенный постинг</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--lime)" stroke-width="1.5" width="18" height="18" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+            <div style="font-size:14px;color:var(--mist);">Скачать все 7 постов одним архивом — «Скачать публикацию»</div>
+          </div>
+        </div>
+        <a href="/register" class="btn-lime">Попробовать бесплатно</a>
+      </div>
+
+      <!-- RIGHT: UI MOCKUP -->
+      <div style="background:var(--ink2);border:1px solid var(--line);border-radius:4px;overflow:hidden;">
+        <!-- header -->
+        <div style="background:var(--ink3);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--snow);">Контент на неделю</div>
+          <div style="background:var(--lime);color:#0d0d0f;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;padding:6px 12px;border-radius:var(--r);">Сгенерировать</div>
+        </div>
+        <!-- days -->
+        <div style="padding:8px 0;">
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);opacity:.5">
+            <div style="width:32px;height:32px;background:rgba(200,241,53,.1);border:1px solid rgba(200,241,53,.2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="none" stroke="#c8f135" stroke-width="2.5" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style="flex:1;font-size:12px;color:var(--smoke);">Знакомство с продуктом</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--smoke)" stroke-width="1.5" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);opacity:.5">
+            <div style="width:32px;height:32px;background:rgba(200,241,53,.1);border:1px solid rgba(200,241,53,.2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="none" stroke="#c8f135" stroke-width="2.5" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style="flex:1;font-size:12px;color:var(--smoke);">Отзыв довольного клиента</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--smoke)" stroke-width="1.5" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);">
+            <div style="width:32px;height:32px;background:var(--ink4);border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;color:var(--smoke);">Ср</span></div>
+            <div style="flex:1;font-size:12px;color:var(--mist);">За кулисами — как мы работаем</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--smoke)" stroke-width="1.5" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);">
+            <div style="width:32px;height:32px;background:var(--ink4);border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;color:var(--smoke);">Чт</span></div>
+            <div style="flex:1;font-size:12px;color:var(--mist);">Акция — скидка 20% на всё меню</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--smoke)" stroke-width="1.5" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);">
+            <div style="width:32px;height:32px;background:var(--ink4);border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;color:var(--smoke);">Пт</span></div>
+            <div style="flex:1;font-size:12px;color:var(--mist);">Полезный совет по теме бизнеса</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--smoke)" stroke-width="1.5" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);">
+            <div style="width:32px;height:32px;background:var(--ink4);border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;color:var(--smoke);">Сб</span></div>
+            <div style="flex:1;font-size:12px;color:var(--mist);">Вовлекающий пост / вопрос аудитории</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--smoke)" stroke-width="1.5" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 18px;">
+            <div style="width:32px;height:32px;background:var(--ink4);border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;color:var(--smoke);">Вс</span></div>
+            <div style="flex:1;font-size:12px;color:var(--mist);">Личная история команды</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--smoke)" stroke-width="1.5" width="13" height="13"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+        </div>
+        <!-- footer -->
+        <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:11px;color:var(--smoke);">Будет списано <b style="color:var(--mist);">7 токенов</b></div>
+          <div style="font-size:11px;color:var(--lime);">Остаток: 93 токена</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<section class="section">
+  <div class="sc">
+    <h2>Контент для <span>всех каналов</span></h2>
+    <p class="ssub">Один запуск — тексты для всех выбранных платформ сразу.</p>
+    <div class="plats fu">
+      <div class="plat"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>Instagram Post</div>
+      <div class="plat"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8"/></svg>Instagram Reels</div>
+      <div class="plat"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>Telegram</div>
+      <div class="plat"><svg viewBox="0 0 24 24"><path d="M2 7h4l3 9 3-9h4l-5 10H7z"/><path d="M14 12h6"/></svg>ВКонтакте</div>
+      <div class="plat"><svg viewBox="0 0 24 24"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>TikTok</div>
+      <div class="plat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Threads</div>
+      <div class="plat"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20"/></svg>Сайт (SEO)</div>
+      <div class="plat"><svg viewBox="0 0 24 24"><path d="M4 19V5h16v9H4"/><path d="M4 14h10"/></svg>Яндекс Дзен</div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<section class="section" id="pricing">
+  <div class="sc">
+    <h2>Выберите <span>подходящий план</span></h2>
+    <p class="ssub">Начните бесплатно — 30 токенов без карты.</p>
+    <div class="pgrid">
+      <div class="pc fu" data-tier="start" data-price="890" onclick="selectTier(this)"><div class="pname">Старт</div><div class="pnum"><sup>₽</sup><span class="price-display">890</span></div><div class="pper">в месяц</div><div class="pdiv"></div><div class="pfs"><div class="pf"><span class="pfy">✓</span>1 проект</div><div class="pf"><span class="pfy">✓</span>30 токенов / месяц</div><div class="pf"><span class="pfy">✓</span>Instagram, VK, Telegram, Threads</div><div class="pf"><span class="pfy">✓</span>1 иллюстрация + 3 регенерации</div><div class="pf off"><span class="pfn">—</span>Reels и TikTok</div><div class="pf off"><span class="pfn">—</span>Автопостинг</div></div><div class="pbtn ghost pc-btn">Выбрать Старт</div></div>
+      <div class="pc pop fu pc-selected" data-tier="business" data-price="2990" onclick="selectTier(this)" style="transition-delay:.1s"><div class="pop-b">Популярный</div><div class="pname">Бизнес</div><div class="pnum"><sup>₽</sup><span class="price-display">2 990</span></div><div class="pper">в месяц</div><div class="pdiv"></div><div class="pfs"><div class="pf"><span class="pfy">✓</span>3 проекта</div><div class="pf"><span class="pfy">✓</span>100 токенов / месяц</div><div class="pf"><span class="pfy">✓</span>Все 8 платформ</div><div class="pf"><span class="pfy">✓</span>Иллюстрация + безлимит</div><div class="pf"><span class="pfy">✓</span>Reels и TikTok сценарии</div><div class="pf"><span class="pfy">✓</span>Автопостинг TG + VK</div></div><div class="pbtn lime pc-btn">✓ Выбрано</div></div>
+      <div class="pc fu" data-tier="agency" data-price="6990" onclick="selectTier(this)" style="transition-delay:.2s"><div class="pname">Агентство</div><div class="pnum"><sup>₽</sup><span class="price-display">6 990</span></div><div class="pper">в месяц</div><div class="pdiv"></div><div class="pfs"><div class="pf"><span class="pfy">✓</span>6 проектов</div><div class="pf"><span class="pfy">✓</span>500 токенов / месяц</div><div class="pf"><span class="pfy">✓</span>Все платформы + приоритет</div><div class="pf"><span class="pfy">✓</span>Видеогенерация (Kling/Runway)</div><div class="pf"><span class="pfy">✓</span>Контент-план на месяц</div><div class="pf"><span class="pfy">✓</span>Персональный менеджер</div></div><div class="pbtn ghost pc-btn">Перейти</div></div>
+    </div>
+
+    <!-- Блок промокода + оформление -->
+    <div id="promo-block" style="max-width:440px;margin:40px auto 0;background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);padding:28px;">
+
+      <!-- Поле промокода -->
+      <div style="margin-bottom:20px;">
+        <div style="font-family:'Unbounded',sans-serif;font-size:10px;font-weight:600;color:var(--smoke);letter-spacing:.4px;margin-bottom:8px;">ПРОМОКОД</div>
+        <div id="promo-field" style="display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--line2);border-radius:var(--r);padding:0 12px;height:44px;transition:border-color .15s;">
+          <svg viewBox="0 0 20 20" fill="none" width="16" height="16" id="promo-ico" style="flex-shrink:0;color:var(--smoke);"><path d="M3.5 12L8 3.5h8.5l1 4.5-9 8.5-5-4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="13" cy="7" r="1.25" fill="currentColor"/></svg>
+          <input id="promo-input" type="text" placeholder="ВВЕДИТЕ КОД" maxlength="32" autocomplete="off" spellcheck="false"
+            style="flex:1;background:none;border:none;outline:none;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--snow);caret-color:var(--lime);"
+            oninput="onPromoInput(this.value)">
+          <span id="promo-badge" style="display:none;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(200,241,53,.12);color:var(--lime);flex-shrink:0;"></span>
+          <button id="promo-clear" onclick="clearPromo()" style="display:none;background:none;border:none;cursor:pointer;color:var(--smoke);padding:0;flex-shrink:0;">
+            <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div id="promo-spinner" style="display:none;width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);border-top-color:var(--mist);animation:spin .7s linear infinite;flex-shrink:0;"></div>
+        </div>
+        <p id="promo-msg" style="font-size:11px;margin-top:6px;padding:0 2px;display:none;"></p>
+      </div>
+
+      <!-- Итого -->
+      <div style="display:flex;align-items:baseline;gap:10px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:20px;">
+        <span style="font-size:13px;color:var(--smoke);">Итого:</span>
+        <span id="price-old" style="display:none;font-family:'Unbounded',sans-serif;font-size:16px;color:var(--smoke);text-decoration:line-through;"></span>
+        <span id="price-final" style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:900;color:var(--snow);">2 990 ₽</span>
+        <span id="price-save" style="display:none;font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--lime);"></span>
+      </div>
+
+      <a id="checkout-btn" href="/register" style="display:block;text-align:center;padding:14px;background:var(--lime);color:#0d0d0f;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;border-radius:var(--r);text-decoration:none;transition:opacity .15s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        Попробовать бесплатно
+      </a>
+      <p style="font-size:11px;color:var(--smoke);text-align:center;margin-top:10px;">Отменить можно в любой момент</p>
+    </div>
+
+  </div>
+</section>
+
+<section class="cta-s">
+  <h2>Попробуйте <span>бесплатно</span> прямо сейчас</h2>
+  <p>Для малого бизнеса, SMM-специалистов и агентств — 30 токенов на старте, без карты</p>
+  <a href="/register" class="btn-lime">Создать проект бесплатно</a>
+</section>
+
+<!-- SVG symbol defs for JS-rendered icons -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ico-ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="ico-tg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></symbol>
+  <symbol id="ico-vk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7h4l3 9 3-9h4l-5 10H7z"/><path d="M14 12h6"/></symbol>
+  <symbol id="ico-tt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></symbol>
+  <symbol id="ico-th" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></symbol>
+  <symbol id="ico-seo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20"/></symbol>
+  <symbol id="ico-img" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+  <symbol id="ico-img2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+  <symbol id="ico-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+</svg>
+
+<footer>
+  <div class="fl">Content<span>Factory</span></div>
+  <div class="flinks"><a href="/register">Регистрация</a><a href="/login">Войти</a><a href="#pricing">Тарифы</a><a href="/contacts">Поддержка</a></div>
+  <div class="fcopy">© 2026 ContentFactory</div>
+</footer>
+
+<script>
+/* ── BURGER ── */
+const burger=document.getElementById('burger');
+const mobMenu=document.getElementById('mobMenu');
+burger.addEventListener('click',()=>{
+  burger.classList.toggle('open');
+  mobMenu.classList.toggle('open');
+  document.body.style.overflow=mobMenu.classList.contains('open')?'hidden':'';
+});
+function closeMob(){
+  burger.classList.remove('open');
+  mobMenu.classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ── DASHBOARD ANIMATION ── */
+(function(){
+  var barHeights=[18,22,20,28,35,42,38,48,55,62,58,70,65,80,76,90,85,95,88,100,96,100,94,98,100,99,100,100];
+  var barsEl=document.getElementById('dbBars');
+  if(!barsEl)return;
+  var months=7;
+  var barsPerMonth=4;
+  var total=months*barsPerMonth;
+  for(var i=0;i<total;i++){
+    var b=document.createElement('div');
+    b.className='db-bar';
+    if(i>=total-8)b.classList.add('active');
+    b.dataset.h=barHeights[i]||80;
+    barsEl.appendChild(b);
+  }
+
+  function animateCount(el,target,suffix,dur){
+    var start=0,step=target/60,cur=0;
+    var iv=setInterval(function(){
+      cur=Math.min(cur+step,target);
+      el.textContent=Math.round(cur)+(suffix||'');
+      if(cur>=target)clearInterval(iv);
+    },dur/60);
+  }
+
+  var dbObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting)return;
+      dbObs.disconnect();
+      // animate bars
+      setTimeout(function(){
+        document.querySelectorAll('.db-bar').forEach(function(b,i){
+          setTimeout(function(){
+            b.style.height=(b.dataset.h||80)+'%';
+          },i*30);
+        });
+      },200);
+      // animate platform bars
+      setTimeout(function(){
+        document.querySelectorAll('.db-plat-bar').forEach(function(b){
+          b.style.width=(b.dataset.w||70)+'%';
+        });
+      },400);
+      // animate KPIs
+      var posts=document.getElementById('kpiPosts');
+      var reach=document.getElementById('kpiReach');
+      var time=document.getElementById('kpiTime');
+      // ×5 больше постов
+      if(posts){
+        var s=0,iv=setInterval(function(){
+          s=Math.min(s+0.1,5);
+          posts.innerHTML=s.toFixed(s<5?1:0)+'<span style="font-size:13px">×</span>';
+          if(s>=5)clearInterval(iv);
+        },1200/50);
+      }
+      // 30 мин вместо 2–4 часов
+      if(reach){
+        var s2=0,iv2=setInterval(function(){
+          s2=Math.min(s2+1,30);
+          reach.innerHTML=s2+'<span style="font-size:11px">мин</span>';
+          if(s2>=30)clearInterval(iv2);
+        },1000/50);
+      }
+      // 70% меньше рутины
+      if(time){
+        var s3=0,iv3=setInterval(function(){
+          s3=Math.min(s3+2,70);
+          time.innerHTML=s3+'<span style="font-size:13px">%</span>';
+          if(s3>=70)clearInterval(iv3);
+        },1200/50);
+      }
+    });
+  },{threshold:0.3});
+
+  var dbWrap=document.querySelector('.db-wrap');
+  if(dbWrap)dbObs.observe(dbWrap);
+})();
+
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:.1});
+document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
+
+/* ── DEMO ── */
+function togglePlat(el){el.classList.toggle('sel');}
+
+const topics=[
+  'Летняя распродажа — скидки до 50%',
+  'Новая коллекция кроссовок Nike 2026',
+  'Открытие кофейни на Арбате',
+  'Акция: 2 пиццы по цене 1',
+];
+function useIco(id){return '<svg width="14" height="14" style="stroke:var(--mist);fill:none"><use href="#'+id+'"/></svg>';}
+const platContents={
+  'Instagram':{
+    icon:useIco('ico-ig'),
+    texts:[
+      '✨ Лето — время ярких скидок! Только до конца месяца — минус 50% на всё. Успей обновить гардероб 🔥\n\n#распродажа #скидки #летняямода',
+      '👟 Они здесь. Новая коллекция Nike уже в наших руках. Беги за своей парой — до конца недели бесплатная доставка 🚀\n\n#nike #кроссовки #новинки',
+      '☕ В самом сердце Арбата открылась наша кофейня! Заходи за уютом и идеальным эспрессо. Первый кофе — в подарок 🎁\n\n#кофейня #арбат #москва',
+      '🍕 2 пиццы по цене одной — это не ошибка, это щедрость! Только сегодня и только у нас. Заказывай прямо сейчас 👇\n\n#пицца #акция #еда',
+    ]
+  },
+  'Telegram':{
+    icon:useIco('ico-tg'),
+    texts:[
+      '📣 Летняя распродажа — старт!\n\nСкидки до 50% на все категории. Акция действует до 31 июля.\n\n→ Каталог: ссылка в описании',
+      '🆕 Новая коллекция Nike 2026 уже в наличии.\n\nСвежие силуэты, технологии Air Max нового поколения. Бесплатная доставка при заказе от 3 000 ₽.',
+      '📍 Мы открылись на Арбате!\n\nСпециальная цена на все напитки в первую неделю. Приходи, мы ждём ☕',
+      '🍕 Акция до конца дня: 2 пиццы = цена 1.\n\nВыбирай любые, от 30 см. Оформить заказ → ссылка.',
+    ]
+  },
+  'ВКонтакте':{
+    icon:useIco('ico-vk'),
+    texts:[
+      'Друзья, объявляем летнюю распродажу! 🎉 Скидки до 50% на весь ассортимент. Переходите в каталог и выбирайте лучшее — количество товаров ограничено.',
+      'Встречайте новую коллекцию Nike 2026! Современный дизайн, максимальный комфорт. Оформляйте заказ сейчас — бесплатная доставка в любую точку России.',
+      'Мы открыли кофейню на Арбате! Уютная атмосфера, авторские напитки, бесплатный вай-фай. Приходите — первый кофе угощаем!',
+      'Акция только сегодня: закажи 2 пиццы и заплати за одну! Минимальный заказ — от 30 см. Успей, количество акционных позиций ограничено.',
+    ]
+  },
+  'TikTok':{
+    icon:useIco('ico-tt'),
+    texts:[
+      'СЦЕНАРИЙ REELS:\n🎬 Хук: "Ты ещё платишь полную цену?"\n📱 Середина: обзор топ-5 позиций со скидкой\n🔥 Финал: "Ссылка в шапке — беги!"',
+      'СЦЕНАРИЙ REELS:\n🎬 Хук: "Так выглядят кроссовки мечты"\n📱 Середина: распаковка, детали, примерка\n🔥 Финал: "Ограниченный дроп — не пропусти"',
+      'СЦЕНАРИЙ REELS:\n🎬 Хук: "Нашли идеальное кафе в Москве"\n📱 Середина: тур по интерьеру, крупный план кофе\n🔥 Финал: "Адрес в описании — зови друзей"',
+      'СЦЕНАРИЙ REELS:\n🎬 Хук: "Две пиццы за цену одной — это реально"\n📱 Середина: доставка, распаковка, реакция\n🔥 Финал: "Успей до полуночи!"',
+    ]
+  },
+  'Threads':{
+    icon:useIco('ico-th'),
+    texts:[
+      'летняя распродажа это не просто слова это 50% с вашего счёта в нашу пользу шутка это в вашу пользу, конечно 🌞',
+      'новая коллекция nike это как первое свидание — волнительно, дорого и хочется повторить',
+      'открыть кофейню на арбате и сделать первый кофе бесплатным — потому что первое впечатление важнее всего ☕',
+      'две пиццы по цене одной — это математика, которую мы поддерживаем всем сердцем 🍕',
+    ]
+  },
+  'SEO':{
+    icon:useIco('ico-seo'),
+    texts:[
+      'META: Летняя распродажа 2026 — скидки до 50%\nDESCRIPTION: Купите одежду и аксессуары со скидкой до 50%. Более 500 позиций в каталоге. Бесплатная доставка от 2000₽. Заказывайте онлайн.',
+      'META: Кроссовки Nike 2026 — новая коллекция | купить\nDESCRIPTION: Официальная новая коллекция Nike Air 2026. Актуальные модели по доступным ценам. Доставка 1–2 дня. Гарантия подлинности.',
+      'META: Кофейня на Арбате — уютное место в центре Москвы\nDESCRIPTION: Авторский кофе, завтраки и десерты на Арбате. Открыты с 8:00 до 23:00. Первый кофе в подарок при первом посещении.',
+      'META: Акция 2 пиццы по цене 1 | доставка пиццы\nDESCRIPTION: Успейте заказать 2 пиццы по цене одной! Свежие ингредиенты, пицца от 30 см. Доставка за 45 минут или бесплатно.',
+    ]
+  }
+};
+
+let demoRunning=false;
+let demoPlayed=false;
+let topicIndex=0;
+let tokenCount=0;
+
+function typeText(el,text,speed){
+  speed=speed||18;
+  return new Promise(function(res){
+    var i=0;
+    el.textContent='';
+    var t=setInterval(function(){
+      if(i<text.length){el.textContent+=text[i++];}
+      else{clearInterval(t);res();}
+    },speed);
+  });
+}
+
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+
+function handleGenBtn(){
+  if(demoPlayed){
+    // спектакль уже сыгран — ведём на регистрацию
+    window.location.href='/register';
+    return;
+  }
+  if(!demoRunning) runDemo();
+}
+
+// Автовыбор платформ по одной с задержкой
+async function autoSelectPlats(platNames){
+  // сначала снимаем все
+  document.querySelectorAll('.d-plat').forEach(function(p){p.classList.remove('sel');});
+  await sleep(300);
+  for(var i=0;i<platNames.length;i++){
+    var name=platNames[i];
+    document.querySelectorAll('.d-plat').forEach(function(p){
+      if(p.textContent.trim()===name) p.classList.add('sel');
+    });
+    await sleep(280);
+  }
+}
+
+async function runDemo(){
+  if(demoRunning)return;
+  demoRunning=true;
+  var btn=document.getElementById('genBtn');
+  btn.disabled=true;
+  btn.style.opacity='.6';
+
+  var ti=topicIndex%topics.length;
+  topicIndex++;
+  var topic=topics[ti];
+
+  // 1. Анимируем выбор платформ
+  await autoSelectPlats(['Instagram','Telegram','ВКонтакте']);
+  await sleep(400);
+
+  // 2. Печатаем тему
+  var demoText=document.getElementById('demoText');
+  await typeText(demoText,topic,28);
+  await sleep(500);
+
+  // 3. Прогресс-бар
+  var prog=document.getElementById('dProgress');
+  var progBar=document.getElementById('dProgressBar');
+  prog.style.opacity='1';
+  progBar.style.width='0';
+
+  var results=document.getElementById('dResults');
+  results.classList.remove('show');
+  results.innerHTML='';
+
+  var t0=performance.now();
+  var w=0;
+  await new Promise(function(res){
+    var iv=setInterval(function(){
+      w=Math.min(w+(Math.random()*4+1),95);
+      progBar.style.width=w+'%';
+      if(w>=95){clearInterval(iv);res();}
+    },40);
+  });
+
+  // 4. Строим карточки
+  var selPlats=['Instagram','Telegram','ВКонтакте'];
+  selPlats.forEach(function(plat,i){
+    var data=platContents[plat]||platContents['Instagram'];
+    var text=data.texts[ti]||data.texts[0];
+    var card=document.createElement('div');
+    card.className='d-card';
+    card.innerHTML=
+      '<div class="d-card-head">'+
+      '<div class="d-card-ico">'+data.icon+'</div>'+
+      '<div class="d-card-plat">'+plat+'</div>'+
+      '</div>'+
+      '<div class="d-card-text" id="ct'+i+'"></div>'+
+      '<div class="d-card-shine"></div>';
+    results.appendChild(card);
+  });
+
+  // image card
+  var imgCard=document.createElement('div');
+  imgCard.className='d-img-card d-card';
+  imgCard.innerHTML=
+    '<div class="d-card-head">'+
+    '<div class="d-card-ico"><svg width="14" height="14" style="stroke:var(--mist);fill:none"><use href="#ico-img"/></svg></div>'+
+    '<div class="d-card-plat">Иллюстрация</div>'+
+    '</div>'+
+    '<div class="d-img-preview" id="imgPrev">'+
+    '<svg width="24" height="24" style="stroke:var(--smoke);fill:none;opacity:.5"><use href="#ico-img2"/></svg>'+
+    '<div class="d-img-glow" id="imgGlow"></div>'+
+    '</div>'+
+    '<div class="d-img-formats" id="imgFmts">'+
+    '<div class="d-fmt">1:1</div><div class="d-fmt">9:16</div><div class="d-fmt">16:9</div>'+
+    '</div>';
+  results.appendChild(imgCard);
+
+  progBar.style.width='100%';
+  await sleep(200);
+  results.classList.add('show');
+  prog.style.opacity='0';
+
+  // 5. Печатаем тексты
+  for(var i=0;i<selPlats.length;i++){
+    var plat=selPlats[i];
+    var data=platContents[plat]||platContents['Instagram'];
+    var text=data.texts[ti]||data.texts[0];
+    var el=document.getElementById('ct'+i);
+    if(el) await typeText(el,text,7);
+  }
+
+  // 6. Иллюстрация
+  await sleep(200);
+  var glow=document.getElementById('imgGlow');
+  if(glow) glow.classList.add('on');
+  document.querySelectorAll('.d-fmt').forEach(function(f,i){
+    setTimeout(function(){f.classList.add('ready');},i*150);
+  });
+
+  // 7. Статус
+  tokenCount+=selPlats.length;
+  document.getElementById('tokenCount').textContent=tokenCount;
+  var elapsed=((performance.now()-t0)/1000).toFixed(1);
+  var timeEl=document.getElementById('dTime');
+  timeEl.innerHTML='Сгенерировано за <em>'+elapsed+'с</em>';
+  timeEl.classList.add('show');
+
+  // 8. Финал — кнопка становится CTA
+  await sleep(600);
+  btn.disabled=false;
+  btn.style.opacity='1';
+  btn.innerHTML='<svg width="11" height="11" style="stroke:#0d0d0f;fill:none"><use href="#ico-bolt"/></svg> Сгенерировать своё';
+  btn.classList.add('cta-mode');
+
+  // показываем подсказку
+  var hint=document.getElementById('dCtaHint');
+  if(hint) hint.classList.add('show');
+
+  demoRunning=false;
+  demoPlayed=true;
+}
+
+// Автозапуск по скроллу — один раз
+var demoAutoObs=new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting && !demoPlayed && !demoRunning){
+      demoAutoObs.disconnect();
+      setTimeout(function(){runDemo();},800);
+    }
+  });
+},{threshold:0.5});
+var demoSection=document.getElementById('demo');
+if(demoSection) demoAutoObs.observe(demoSection);
+
+</script>
+<script>
+// ── Тарифы ──────────────────────────────────────────────────────────────────
+var TIERS = {
+  start:    { price: 890,  label: 'Старт',     cta: 'Выбрать Старт' },
+  business: { price: 2990, label: 'Бизнес',    cta: 'Попробовать бесплатно' },
+  agency:   { price: 6990, label: 'Агентство', cta: 'Перейти' },
+};
+var selectedTier = 'business';
+var currentDiscount = 0;
+var promoDebounce = null;
+
+function selectTier(el) {
+  var tier = el.dataset.tier;
+  if (!tier) return;
+  selectedTier = tier;
+
+  // Снимаем выделение со всех
+  document.querySelectorAll('.pc').forEach(function(c) {
+    c.classList.remove('pc-selected');
+    var btn = c.querySelector('.pc-btn');
+    var t = c.dataset.tier;
+    if (btn && t) {
+      btn.className = 'pbtn ghost pc-btn';
+      btn.textContent = TIERS[t].cta;
+    }
+  });
+
+  // Выделяем выбранный
+  el.classList.add('pc-selected');
+  var activeBtn = el.querySelector('.pc-btn');
+  if (activeBtn) {
+    activeBtn.className = 'pbtn lime pc-btn';
+    activeBtn.textContent = '✓ Выбрано';
+  }
+
+  // Сбрасываем промокод при смене тарифа
+  clearPromo();
+  updatePrice();
+}
+
+// ── Цена ────────────────────────────────────────────────────────────────────
+function updatePrice() {
+  var base = TIERS[selectedTier].price;
+  var final = Math.round(base * (100 - currentDiscount) / 100);
+
+  var elOld   = document.getElementById('price-old');
+  var elFinal = document.getElementById('price-final');
+  var elSave  = document.getElementById('price-save');
+  var elBtn   = document.getElementById('checkout-btn');
+
+  if (currentDiscount > 0) {
+    elOld.style.display = 'inline';
+    elOld.textContent = base.toLocaleString('ru') + ' ₽';
+    elSave.style.display = 'inline';
+    elSave.textContent = '−' + currentDiscount + '%';
+    elFinal.style.color = 'var(--lime)';
+  } else {
+    elOld.style.display = 'none';
+    elSave.style.display = 'none';
+    elFinal.style.color = 'var(--snow)';
+  }
+
+  if (currentDiscount === 100) {
+    elFinal.textContent = 'Бесплатно';
+    elBtn.textContent = 'Получить бесплатно';
+  } else {
+    elFinal.textContent = final.toLocaleString('ru') + ' ₽';
+    elBtn.textContent = TIERS[selectedTier].cta;
+  }
+}
+
+// ── Промокод ─────────────────────────────────────────────────────────────────
+function onPromoInput(raw) {
+  var val = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  var input = document.getElementById('promo-input');
+  if (input.value !== val) input.value = val;
+
+  var clear = document.getElementById('promo-clear');
+  clear.style.display = val ? 'flex' : 'none';
+
+  if (!val) { resetPromoUI(); return; }
+  if (val.length < 3) return;
+
+  if (promoDebounce) clearTimeout(promoDebounce);
+  promoDebounce = setTimeout(function() { validatePromo(val); }, 600);
+}
+
+async function validatePromo(code) {
+  setPromoState('loading');
+  try {
+    var res = await fetch('/api/promo/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code, tier: selectedTier }),
+    });
+    var json = await res.json();
+    if (json.valid) {
+      currentDiscount = json.discount;
+      setPromoState('valid', json.discount);
+    } else {
+      currentDiscount = 0;
+      setPromoState('invalid', 0, json.error || 'Неверный промокод');
+    }
+  } catch(e) {
+    currentDiscount = 0;
+    setPromoState('invalid', 0, 'Ошибка сети');
+  }
+  updatePrice();
+}
+
+function setPromoState(state, discount, errorMsg) {
+  var field   = document.getElementById('promo-field');
+  var badge   = document.getElementById('promo-badge');
+  var spinner = document.getElementById('promo-spinner');
+  var msg     = document.getElementById('promo-msg');
+  var ico     = document.getElementById('promo-ico');
+
+  // Сброс
+  badge.style.display = 'none';
+  spinner.style.display = 'none';
+  msg.style.display = 'none';
+
+  if (state === 'loading') {
+    field.style.borderColor = 'var(--line2)';
+    spinner.style.display = 'block';
+  } else if (state === 'valid') {
+    field.style.borderColor = 'rgba(200,241,53,.4)';
+    field.style.background = 'rgba(200,241,53,.04)';
+    ico.style.color = 'var(--lime)';
+    badge.style.display = 'inline';
+    badge.textContent = '−' + discount + '%';
+    msg.style.display = 'block';
+    msg.style.color = 'var(--lime)';
+    var base = TIERS[selectedTier].price;
+    var final = Math.round(base * (100 - discount) / 100);
+    msg.textContent = discount === 100
+      ? 'Промокод применён — бесплатно!'
+      : 'Промокод применён — скидка ' + discount + '% → ' + final.toLocaleString('ru') + ' ₽/мес';
+  } else if (state === 'invalid') {
+    field.style.borderColor = 'rgba(255,80,80,.4)';
+    field.style.background = 'var(--ink3)';
+    ico.style.color = 'var(--smoke)';
+    msg.style.display = 'block';
+    msg.style.color = '#ff5050';
+    msg.textContent = errorMsg;
+  }
+}
+
+function resetPromoUI() {
+  currentDiscount = 0;
+  var field   = document.getElementById('promo-field');
+  var badge   = document.getElementById('promo-badge');
+  var spinner = document.getElementById('promo-spinner');
+  var msg     = document.getElementById('promo-msg');
+  var ico     = document.getElementById('promo-ico');
+  field.style.borderColor = 'var(--line2)';
+  field.style.background = 'var(--ink3)';
+  ico.style.color = 'var(--smoke)';
+  badge.style.display = 'none';
+  spinner.style.display = 'none';
+  msg.style.display = 'none';
+  updatePrice();
+}
+
+function clearPromo() {
+  if (promoDebounce) clearTimeout(promoDebounce);
+  document.getElementById('promo-input').value = '';
+  document.getElementById('promo-clear').style.display = 'none';
+  resetPromoUI();
+}
+
+// Инит — показываем цену выбранного тарифа сразу
+updatePrice();
+</script>
+
+</body>
+</html>
