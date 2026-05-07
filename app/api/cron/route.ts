@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -41,20 +41,18 @@ async function publishToVK(text: string, token: string, groupId?: string): Promi
 }
 
 export async function GET(req: NextRequest) {
-  // Проверяем секретный ключ для Cron Job
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const now = new Date().toISOString()
 
-    // Находим все задачи которые нужно опубликовать
     const { data: posts, error } = await supabase
       .from('scheduled_posts')
-      .select('*, projects:user_id(tg_bot_token, tg_channel_id, vk_token, business_name, niche, description, usp, advantages, audience, style)')
+      .select('*')
       .eq('status', 'pending')
       .lte('scheduled_at', now)
       .limit(10)
@@ -68,13 +66,11 @@ export async function GET(req: NextRequest) {
 
     for (const post of posts) {
       try {
-        // Помечаем как "генерируется"
         await supabase
           .from('scheduled_posts')
           .update({ status: 'generating', updated_at: new Date().toISOString() })
           .eq('id', post.id)
 
-        // Получаем профиль проекта
         const { data: project } = await supabase
           .from('projects')
           .select('*')
@@ -82,9 +78,10 @@ export async function GET(req: NextRequest) {
           .limit(1)
           .single()
 
-        const businessContext = project ? `Бизнес: ${project.business_name}. Ниша: ${project.niche}. Описание: ${project.description}. УТП: ${project.usp}. Аудитория: ${project.audience}. Стиль: ${project.style ?? 'дружелюбный'}.` : ''
+        const businessContext = project
+          ? `Бизнес: ${project.business_name}. Ниша: ${project.niche}. Описание: ${project.description}. УТП: ${project.usp}. Аудитория: ${project.audience}. Стиль: ${project.style ?? 'дружелюбный'}.`
+          : ''
 
-        // Генерируем текст
         const prompt = PLATFORM_PROMPTS[post.platform] ?? 'Напиши короткий пост для социальной сети.'
         const msg = await openai.chat.completions.create({
           model: 'gpt-4o',
@@ -96,7 +93,6 @@ export async function GET(req: NextRequest) {
         })
         const generatedText = msg.choices[0].message.content ?? ''
 
-        // Публикуем
         if (post.platform === 'telegram' && project?.tg_bot_token && project?.tg_channel_id) {
           await publishToTelegram(generatedText, project.tg_bot_token, project.tg_channel_id)
         } else if (post.platform === 'vk' && project?.vk_token) {
@@ -105,7 +101,6 @@ export async function GET(req: NextRequest) {
           throw new Error(`Платформа ${post.platform} не подключена`)
         }
 
-        // Помечаем как опубликовано
         await supabase
           .from('scheduled_posts')
           .update({
