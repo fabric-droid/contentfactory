@@ -20,10 +20,12 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: `${siteUrl}/auth/callback` },
     })
 
     if (error) {
